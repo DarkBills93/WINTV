@@ -7,37 +7,67 @@ function volver() {
     window.location.href = "index.html";
 }
 
-// Formulario Planta
+// Guardar datos
 document.addEventListener("DOMContentLoaded", () => {
     const form = document.getElementById("formPlanta");
 
     if (form) {
+        cargarHistorial();
+
         form.addEventListener("submit", function(e) {
             e.preventDefault();
 
-            const preformados = document.getElementById("preformados").value;
-            const splitter = document.getElementById("splitter").value;
-            const fibra = document.getElementById("fibra").value;
+            const data = {
+                preformados: document.getElementById("preformados").value,
+                splitter: document.getElementById("splitter").value,
+                fibra: document.getElementById("fibra").value,
+                empalmadora: document.getElementById("empalmadora").checked,
+                manguitas: document.getElementById("manguitas").checked,
+                cortadora: document.getElementById("cortadora").checked,
+                fibraActiva: document.getElementById("fibraActiva").checked,
+                fecha: new Date().toLocaleString()
+            };
 
-            const empalmadora = document.getElementById("empalmadora").checked;
-            const manguitas = document.getElementById("manguitas").checked;
-            const cortadora = document.getElementById("cortadora").checked;
-            const fibraActiva = document.getElementById("fibraActiva").checked;
+            let registros = JSON.parse(localStorage.getItem("planta")) || [];
+            registros.push(data);
+            localStorage.setItem("planta", JSON.stringify(registros));
 
-            const resultado = `
-                <h3>Resumen:</h3>
-                <p><b>Preformados:</b> ${preformados}</p>
-                <p><b>Splitter:</b> ${splitter}</p>
-                <p><b>Fibra:</b> ${fibra} hilos</p>
-                <p><b>Equipos:</b> 
-                ${empalmadora ? "Empalmadora, " : ""}
-                ${manguitas ? "Manguitas, " : ""}
-                ${cortadora ? "Cortadora, " : ""}
-                ${fibraActiva ? "Fibra Activa" : ""}
-                </p>
-            `;
-
-            document.getElementById("resultado").innerHTML = resultado;
+            form.reset();
+            cargarHistorial();
         });
     }
 });
+
+// Mostrar historial
+function cargarHistorial() {
+    const contenedor = document.getElementById("historial");
+    const registros = JSON.parse(localStorage.getItem("planta")) || [];
+
+    contenedor.innerHTML = "";
+
+    registros.forEach((item, index) => {
+        contenedor.innerHTML += `
+            <div class="card">
+                <p><b>Fecha:</b> ${item.fecha}</p>
+                <p>Preformados: ${item.preformados}</p>
+                <p>Splitter: ${item.splitter}</p>
+                <p>Fibra: ${item.fibra}</p>
+                <p>
+                    ${item.empalmadora ? "Empalmadora ✔️" : ""}
+                    ${item.manguitas ? " Manguitas ✔️" : ""}
+                    ${item.cortadora ? " Cortadora ✔️" : ""}
+                    ${item.fibraActiva ? " Fibra Activa ✔️" : ""}
+                </p>
+                <button onclick="eliminar(${index})">🗑 Eliminar</button>
+            </div>
+        `;
+    });
+}
+
+// Eliminar registro
+function eliminar(index) {
+    let registros = JSON.parse(localStorage.getItem("planta")) || [];
+    registros.splice(index, 1);
+    localStorage.setItem("planta", JSON.stringify(registros));
+    cargarHistorial();
+}
