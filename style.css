@@ -1,1 +1,75 @@
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    color: white;
+}
 
+.container {
+    text-align: center;
+    margin-top: 80px;
+}
+
+h1 {
+    margin-bottom: 30px;
+}
+
+.menu button {
+    display: block;
+    width: 280px;
+    margin: 10px auto;
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    background: #00c6ff;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.menu button:hover {
+    background: #0072ff;
+    transform: scale(1.05);
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+    margin: auto;
+    gap: 10px;
+}
+
+input, button {
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+}
+
+button {
+    background: #00c6ff;
+    color: white;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #0072ff;
+}
+
+#resultado {
+    margin-top: 20px;
+    background: rgba(0,0,0,0.3);
+    padding: 15px;
+    border-radius: 10px;
+}
+
+/* Animación */
+.fade-in {
+    animation: fadeIn 1s ease-in;
+}
+
+@keyframes fadeIn {
+    from {opacity: 0; transform: translateY(20px);}
+    to {opacity: 1; transform: translateY(0);}
+}
