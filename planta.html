@@ -12,24 +12,20 @@
 
     <form id="formPlanta">
 
-        <label>Preformados (Color):</label>
-        <input type="text" id="preformados" placeholder="Ej: Rojo">
-
-        <label>Splitter:</label>
-        <input type="text" id="splitter" placeholder="1x8 o 1x16">
-
-        <label>Fibra (Cantidad de hilos):</label>
-        <input type="number" id="fibra" placeholder="Ej: 12">
+        <input type="text" id="preformados" placeholder="Preformados (color)">
+        <input type="text" id="splitter" placeholder="Splitter (1x8 o 1x16)">
+        <input type="number" id="fibra" placeholder="Fibra (hilos)">
 
         <label><input type="checkbox" id="empalmadora"> Empalmadora</label>
         <label><input type="checkbox" id="manguitas"> Manguitas</label>
         <label><input type="checkbox" id="cortadora"> Cortadora</label>
         <label><input type="checkbox" id="fibraActiva"> Fibra Activa</label>
 
-        <button type="submit">Guardar</button>
+        <button type="submit">💾 Guardar</button>
     </form>
 
-    <div id="resultado"></div>
+    <h2>📋 Historial</h2>
+    <div id="historial"></div>
 
     <br>
     <button onclick="volver()">⬅ Volver</button>
