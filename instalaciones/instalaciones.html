@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instalaciones</title>
+    <link rel="stylesheet" href="estilo.css">
+    <script src="jscr.js" defer></script>
+</head>
+<body>
+    <div class="contenido">
+        <div id="encabezado">
+            <h1>Materiales para Instalaciones</h1>
+        </div>
+
+        <form id="instamat">
+
+            <label class="fila">Conectores Mecanicos <input type="number" id="mecanico" placeholder="cantidad"></label>
+            <label class="fila">Conectores RG6 <input type="number" id="rg6" placeholder="cantidad"></label>
+            <label class="fila">Coaxial <input type="number" id="coaxial" placeholder="metros"></label>
+            <label class="fila">Fibra Drop <input type="number" id="drop" placeholder="metros"> </label>
+
+            <div class="marcar">
+                <label class="marcar"> <input type="checkbox" id="contrato" > Contratos</label>
+                <label class="marcar"> <input type="checkbox" id="grapas" > Grapas</label>
+                <label class="marcar"> <input type="checkbox" id="duo" > Equipos Duo </label>
+                <label class="marcar"> <input type="checkbox" id="internet" > Equipos solo Internet </label>
+                <label class="marcar"> <input type="checkbox" id="cable"> Equipos solo cable </label>
+                <label class="marcar"> <input type="checkbox" id="wincha" > Wincha Pasacable </label>
+            </div>
+
+            <button type="submit">Registrar</button><BR>
+            <button class="export" onclick="exportarCSV()">Exportar a Excel</button>
+
+        
+        </form>
+        <h2>Registro</h2>
+        <div id="registro"></div>
+           <button onclick="volver()">Atras</button>
+         </div>
+    
+</body>
+</html>

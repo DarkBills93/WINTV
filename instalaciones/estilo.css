@@ -1,0 +1,48 @@
+body  {
+    margin: 5;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #0d5472, #224855, #001016);
+    color: rgb(255, 255, 255);
+}
+
+#encabezado {
+    margin-bottom: 5%;
+    text-align: center;
+}
+
+.contenido {
+    margin-bottom: 5%;
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    width: 400px;
+    gap: 10px;
+    
+}
+
+
+#instamat label {
+    display: grid;
+    grid-template-columns: 1fr 180px;
+    gap: 0px;
+    white-space: nowrap;
+    margin-bottom: 5px;
+}
+
+
+input  {
+    padding: 5px;
+    border-radius: 5%;
+}
+
+button {
+    margin-top: 8%;
+    background: #ffffff;
+    color: rgb(0, 0, 0);
+    cursor: pointer;
+    border-color: #0d5472;
+    width: 100px;
+    border-radius: 10px;
+    padding: 5px;
+
+}
