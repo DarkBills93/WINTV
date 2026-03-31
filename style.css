@@ -1,14 +1,30 @@
-body {
+/* RESET */
+* {
     margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* BODY */
+body {
     font-family: 'Segoe UI', sans-serif;
     background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
     color: white;
+    min-height: 100vh;
 }
 
 /* CONTENEDOR */
 .container {
+    max-width: 900px;
+    margin: auto;
+    padding: 40px 20px;
     text-align: center;
-    margin-top: 60px;
+}
+
+/* TITULOS */
+h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
 }
 
 .subtitle {
@@ -16,19 +32,16 @@ body {
     margin-bottom: 30px;
 }
 
-/* MENU */
+/* MENU GRID */
 .menu {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 20px;
 }
 
-/* BOTONES TIPO TARJETA */
+/* BOTONES */
 .card-btn {
-    display: block;
-    width: 280px;
-    padding: 20px;
+    padding: 25px;
     border-radius: 15px;
     background: rgba(255,255,255,0.1);
     text-decoration: none;
@@ -39,17 +52,15 @@ body {
 }
 
 .card-btn:hover {
-    transform: translateY(-5px) scale(1.03);
+    transform: translateY(-5px);
     background: rgba(0,198,255,0.3);
 }
 
-/* FORMULARIO */
+/* FORM */
 form {
-    display: flex;
-    flex-direction: column;
-    width: 320px;
-    margin: auto;
+    display: grid;
     gap: 12px;
+    margin-top: 20px;
 }
 
 /* INPUTS */
@@ -57,7 +68,6 @@ input {
     padding: 12px;
     border-radius: 10px;
     border: none;
-    outline: none;
 }
 
 /* BOTONES */
@@ -78,8 +88,7 @@ button:hover {
 /* HISTORIAL */
 #historial {
     margin-top: 30px;
-    display: flex;
-    flex-direction: column;
+    display: grid;
     gap: 15px;
 }
 
@@ -89,48 +98,11 @@ button:hover {
     padding: 15px;
     border-radius: 12px;
     text-align: left;
-    backdrop-filter: blur(8px);
 }
 
-/* BOTON ELIMINAR */
-.card button {
-    margin-top: 10px;
-    background: #ff4d4d;
-}
-
-.card button:hover {
-    background: #cc0000;
-}
-
-/* ANIMACION */
-.fade-in {
-    animation: fadeIn 0.8s ease-in;
-}
-
-@keyframes fadeIn {
-    from {opacity: 0; transform: translateY(20px);}
-    to {opacity: 1; transform: translateY(0);}
-}
-
-.menu a {
-    display: block;
-    width: 280px;
-    margin: 10px auto;
-    padding: 15px;
-    border-radius: 10px;
-    background: #00c6ff;
-    color: white;
-    font-size: 16px;
-    text-decoration: none;
-    transition: 0.3s;
-}
-
-.menu a:hover {
-    background: #0072ff;
-    transform: scale(1.05);
-}
-
-.container {
-    text-align: center;
-    margin-top: 80px;
+/* RESPONSIVE */
+@media (max-width: 600px) {
+    h1 {
+        font-size: 1.8rem;
+    }
 }
