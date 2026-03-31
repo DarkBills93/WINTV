@@ -63,5 +63,5 @@ function mostrarHistorial() {
 }
 
 function volver() {
-    window.location.href = "index.html";
+    window.location.href = "../index.html";
 }
