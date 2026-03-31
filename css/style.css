@@ -30,7 +30,7 @@ body {
 }
 
 .logo-inline {
-    width: 40px;    /* tamaño proporcional */
+    width: 1.2em;    /* tamaño proporcional */
     height: auto;
 }
 
