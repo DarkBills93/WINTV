@@ -8,14 +8,25 @@
 /* BODY */
 body {
     font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-    color: white;
+    background: linear-gradient(135deg, #0b1f2a, #12394a, #1c4e63);
+    color: #e6f1f5;
     min-height: 100vh;
+}
+
+/* HEADER / LOGO */
+.header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.logo {
+    width: 80px;
+    margin-bottom: 10px;
 }
 
 /* CONTENEDOR */
 .container {
-    max-width: 900px;
+    max-width: 1000px;
     margin: auto;
     padding: 40px 20px;
     text-align: center;
@@ -23,37 +34,54 @@ body {
 
 /* TITULOS */
 h1 {
-    font-size: 2.5rem;
-    margin-bottom: 10px;
+    font-size: 2.3rem;
+    margin-bottom: 5px;
+    font-weight: 600;
 }
 
 .subtitle {
-    opacity: 0.8;
+    opacity: 0.7;
     margin-bottom: 30px;
 }
 
 /* MENU GRID */
 .menu {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px;
 }
 
-/* BOTONES */
+/* TARJETAS BOTÓN */
 .card-btn {
-    padding: 25px;
-    border-radius: 15px;
-    background: rgba(255,255,255,0.1);
+    padding: 30px 20px;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.05);
     text-decoration: none;
-    color: white;
+    color: #e6f1f5;
     font-size: 18px;
-    backdrop-filter: blur(10px);
-    transition: 0.3s;
+    font-weight: 500;
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.08);
+    transition: all 0.3s ease;
 }
 
+/* EFECTO HOVER */
 .card-btn:hover {
-    transform: translateY(-5px);
-    background: rgba(0,198,255,0.3);
+    transform: translateY(-6px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+/* COLORES POR SECCIÓN */
+.instalaciones {
+    background: linear-gradient(135deg, #0072ff, #00c6ff);
+}
+
+.averias {
+    background: linear-gradient(135deg, #ff6a00, #ff3d00);
+}
+
+.planta {
+    background: linear-gradient(135deg, #00c9a7, #00ff9d);
 }
 
 /* FORM */
@@ -68,6 +96,7 @@ input {
     padding: 12px;
     border-radius: 10px;
     border: none;
+    outline: none;
 }
 
 /* BOTONES */
@@ -94,10 +123,11 @@ button:hover {
 
 /* TARJETAS */
 .card {
-    background: rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.08);
     padding: 15px;
     border-radius: 12px;
     text-align: left;
+    border-left: 4px solid #00c6ff;
 }
 
 /* RESPONSIVE */
@@ -106,4 +136,3 @@ button:hover {
         font-size: 1.8rem;
     }
 }
-
