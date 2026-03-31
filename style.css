@@ -129,3 +129,8 @@ button:hover {
     background: #0072ff;
     transform: scale(1.05);
 }
+
+.container {
+    text-align: center;
+    margin-top: 80px;
+}
