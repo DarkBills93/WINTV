@@ -8,29 +8,54 @@
 <body>
 
 <div class="container fade-in">
-    <h1>🌐 Materiales de Planta Externa</h1>
 
-    <form id="formPlanta">
+    <!-- Header -->
+    <div class="title-logo">
+        <img src="img/logo.png" alt="Logo" class="logo-inline">
+        <h1>🌐 Materiales de Planta Externa</h1>
+    </div>
 
-        <input type="text" id="preformados" placeholder="Preformados (color)">
-        <input type="text" id="splitter" placeholder="Splitter (1x8 o 1x16)">
-        <input type="number" id="fibra" placeholder="Fibra (hilos)">
+    <!-- Formulario -->
+    <form id="formPlanta" class="form-grid">
 
-        <label><input type="checkbox" id="empalmadora"> Empalmadora</label>
-        <label><input type="checkbox" id="manguitas"> Manguitas</label>
-        <label><input type="checkbox" id="cortadora"> Cortadora</label>
-        <label><input type="checkbox" id="fibraActiva"> Fibra Activa</label>
+        <label>Preformados:</label>
+        <input type="text" id="preformados" placeholder="Color">
 
+        <label>Splitter:</label>
+        <input type="text" id="splitter" placeholder="1x8 o 1x16">
+
+        <label>Fibra:</label>
+        <input type="number" id="fibra" placeholder="Cantidad de hilos">
+
+        <label>Empalmadora:</label>
+        <input type="checkbox" id="empalmadora">
+
+        <label>Manguitas:</label>
+        <input type="checkbox" id="manguitas">
+
+        <label>Cortadora:</label>
+        <input type="checkbox" id="cortadora">
+
+        <label>Fibra Activa:</label>
+        <input type="checkbox" id="fibraActiva">
+
+        <div></div> <!-- espacio para alinear botones -->
         <button type="submit">💾 Guardar</button>
     </form>
 
+    <!-- Botones -->
+    <div class="action-buttons">
+        <button onclick="exportExcel()">📤 Exportar a Excel</button>
+        <button onclick="volver()">⬅ Volver</button>
+    </div>
+
+    <!-- Historial -->
     <h2>📋 Historial</h2>
     <div id="historial"></div>
 
-    <br>
-    <button onclick="volver()">⬅ Volver</button>
 </div>
 
-<script src="script.js"></script>
+<script src="js/script.js"></script>
+<script src="js/xlsx.full.min.js"></script> <!-- Librería para exportar Excel -->
 </body>
 </html>
