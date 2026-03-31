@@ -5,68 +5,106 @@ body {
     color: white;
 }
 
+/* CONTENEDOR */
 .container {
     text-align: center;
-    margin-top: 80px;
+    margin-top: 60px;
 }
 
-h1 {
+.subtitle {
+    opacity: 0.8;
     margin-bottom: 30px;
 }
 
-.menu button {
+/* MENU */
+.menu {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+/* BOTONES TIPO TARJETA */
+.card-btn {
     display: block;
     width: 280px;
-    margin: 10px auto;
-    padding: 15px;
-    border: none;
-    border-radius: 10px;
-    background: #00c6ff;
+    padding: 20px;
+    border-radius: 15px;
+    background: rgba(255,255,255,0.1);
+    text-decoration: none;
     color: white;
-    font-size: 16px;
+    font-size: 18px;
+    backdrop-filter: blur(10px);
+    transition: 0.3s;
+}
+
+.card-btn:hover {
+    transform: translateY(-5px) scale(1.03);
+    background: rgba(0,198,255,0.3);
+}
+
+/* FORMULARIO */
+form {
+    display: flex;
+    flex-direction: column;
+    width: 320px;
+    margin: auto;
+    gap: 12px;
+}
+
+/* INPUTS */
+input {
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    outline: none;
+}
+
+/* BOTONES */
+button {
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    background: linear-gradient(45deg, #00c6ff, #0072ff);
+    color: white;
     cursor: pointer;
     transition: 0.3s;
 }
 
-.menu button:hover {
-    background: #0072ff;
+button:hover {
     transform: scale(1.05);
 }
 
-form {
+/* HISTORIAL */
+#historial {
+    margin-top: 30px;
     display: flex;
     flex-direction: column;
-    width: 300px;
-    margin: auto;
-    gap: 10px;
+    gap: 15px;
 }
 
-input, button {
-    padding: 10px;
-    border-radius: 8px;
-    border: none;
-}
-
-button {
-    background: #00c6ff;
-    color: white;
-    cursor: pointer;
-}
-
-button:hover {
-    background: #0072ff;
-}
-
-#resultado {
-    margin-top: 20px;
-    background: rgba(0,0,0,0.3);
+/* TARJETAS */
+.card {
+    background: rgba(255,255,255,0.1);
     padding: 15px;
-    border-radius: 10px;
+    border-radius: 12px;
+    text-align: left;
+    backdrop-filter: blur(8px);
 }
 
-/* Animación */
+/* BOTON ELIMINAR */
+.card button {
+    margin-top: 10px;
+    background: #ff4d4d;
+}
+
+.card button:hover {
+    background: #cc0000;
+}
+
+/* ANIMACION */
 .fade-in {
-    animation: fadeIn 1s ease-in;
+    animation: fadeIn 0.8s ease-in;
 }
 
 @keyframes fadeIn {
