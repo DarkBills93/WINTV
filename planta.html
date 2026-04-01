@@ -9,53 +9,51 @@
 
 <div class="container fade-in">
 
-    <!-- Header -->
     <div class="title-logo">
-    <h1>🌐 Materiales de Planta Externa</h1>
+        <h1>🌐 Materiales de Planta Externa</h1>
     </div>
 
-    <!-- Formulario -->
     <form id="formPlanta" class="form-grid">
-
-        <label>Preformados:</label>
+        <label for="preformados">Preformados:</label>
         <input type="text" id="preformados" placeholder="Color">
 
-        <label>Splitter:</label>
+        <label for="splitter">Splitter:</label>
         <input type="text" id="splitter" placeholder="1x8 o 1x16">
 
-        <label>Fibra:</label>
+        <label for="fibra">Fibra:</label>
         <input type="number" id="fibra" placeholder="Cantidad de hilos">
 
-        <label>Empalmadora:</label>
+        <label for="empalmadora">Empalmadora:</label>
         <input type="checkbox" id="empalmadora">
 
-        <label>Manguitas:</label>
+        <label for="manguitas">Manguitas:</label>
         <input type="checkbox" id="manguitas">
 
-        <label>Cortadora:</label>
+        <label for="cortadora">Cortadora:</label>
         <input type="checkbox" id="cortadora">
 
-        <label>Fibra Activa:</label>
+        <label for="fibraActiva">Fibra Activa:</label>
         <input type="checkbox" id="fibraActiva">
 
-        <div></div> <!-- espacio para alinear botones -->
-        <button type="submit">💾 Guardar</button>
+        <div class="form-footer">
+            <button type="submit" class="btn-primary">💾 Guardar Registro</button>
+        </div>
     </form>
 
-    <!-- Botones -->
     <div class="action-buttons">
-        <button onclick="exportExcel()">📤 Exportar a Excel</button>
-        <button onclick="volver()">⬅ Volver</button>
+        <button onclick="exportExcel()" class="btn-excel">📤 Exportar a Excel</button>
+        <button onclick="volver()" class="btn-back">⬅ Volver</button>
     </div>
 
-    <!-- Historial -->
-    <h2>📋 Historial</h2>
-    <div id="historial"></div>
+    <div class="history-section">
+        <h2>📋 Historial de Planta Externa</h2>
+        <div id="historial" class="table-container">
+            </div>
+    </div>
 
 </div>
 
+<script src="js/xlsx.full.min.js"></script>
 <script src="js/script.js"></script>
-<script src="js/xlsx.full.min.js"></script> <!-- Librería para exportar Excel -->
-    <button onclick="window.history.back()" class="btn-volver">Volver</button>
 </body>
 </html>
