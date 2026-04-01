@@ -201,3 +201,22 @@ button:hover {
 .action-buttons button:hover {
     transform: scale(1.05);
 }
+/* Corrección para que los checkboxes no floten en el centro */
+.form-grid input[type="checkbox"] {
+    justify-self: start; /* Alinea el checkbox a la izquierda de su columna */
+    cursor: pointer;
+}
+
+/* Colores específicos para botones de acción */
+.btn-excel {
+    background: linear-gradient(45deg, #1d6f42, #28a745) !important; /* Verde Excel */
+}
+
+.btn-back {
+    background: linear-gradient(45deg, #4b6cb7, #182848) !important; /* Azul oscuro */
+}
+
+/* Evitar que aparezcan botones extra fuera del contenedor */
+#volver-fantasma {
+    display: none !important;
+}
