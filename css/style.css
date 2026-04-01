@@ -5,46 +5,36 @@
     box-sizing: border-box;
 }
 
-/* BODY CON FONDO DINÁMICO Y MARCA DE AGUA */
+/* BODY: FONDO ACOPLADO AL LOGO (NEGRO/AZUL PROFUNDO) */
 body {
     font-family: 'Segoe UI', sans-serif;
     color: #e6f1f5;
     min-height: 100vh;
     position: relative;
     overflow-x: hidden;
-    /* Fondo base sólido para evitar parpadeos */
-    background-color: #0b1f2a;
+    background-color: #050c12; /* Negro azulado base */
 }
 
-/* Capa de Marca de Agua y Degradado */
+/* Capas de Fondo: Degradado y Marca de Agua */
 body::before {
     content: "";
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0; width: 100%; height: 100%;
     z-index: -1;
-    /* Degradado principal */
-    background: linear-gradient(135deg, #0b1f2a, #12394a, #1c4e63);
+    /* Degradado oscuro para que el celeste del logo resalte */
+    background: linear-gradient(135deg, #050c12 0%, #0a1921 50%, #000000 100%);
 }
 
 body::after {
     content: "";
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0; width: 100%; height: 100%;
     z-index: -1;
-    /* Configuración del Logo como Marca de Agua */
     background-image: url('../img/logo.png');
     background-repeat: repeat;
     background-position: center;
-    /* Como el logo es 1000x1000, lo escalamos a 180px para que se vea como patrón */
-    background-size: 180px; 
-    /* Opacidad muy baja para que sea sutil y no moleste la vista */
-    opacity: 0.04; 
+    background-size: 160px; /* Tamaño del patrón de marca de agua */
+    opacity: 0.06; /* Sutil pero visible sobre el fondo negro */
     pointer-events: none;
 }
 
@@ -54,25 +44,29 @@ body::after {
     margin-bottom: 20px;
 }
 
-/* TÍTULO CON LOGO INLINE */
+/* TÍTULO REESCALADO Y ACOPLADO */
 .title-logo {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 15px;
-    font-size: 2.8rem;
-    font-weight: 600;
+    gap: 20px;
+    margin-top: 20px;
+    margin-bottom: 40px;
+}
+
+.title-logo h1 {
+    font-size: 3.5rem; /* Tamaño aumentado para impacto */
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: -1px;
+    color: #ffffff;
+    text-shadow: 0 4px 15px rgba(0, 198, 255, 0.3); /* Brillo celeste sutil */
 }
 
 .logo-inline {
-    width: 2em;
+    width: 3.5rem; /* Ajustado al nuevo tamaño del texto */
     height: auto;
-}
-
-/* SUBTÍTULO */
-.subtitle {
-    opacity: 0.7;
-    margin-bottom: 30px;
+    filter: drop-shadow(0 0 10px rgba(0, 198, 255, 0.5));
 }
 
 /* CONTENEDOR */
@@ -81,134 +75,68 @@ body::after {
     margin: auto;
     padding: 40px 20px;
     text-align: center;
-    position: relative; /* Para quedar sobre las capas de fondo */
-}
-
-/* MENU GRID */
-.menu {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 25px;
-}
-
-/* TARJETAS BOTÓN */
-.card-btn {
-    padding: 30px 20px;
-    border-radius: 18px;
-    background: rgba(255,255,255,0.05);
-    text-decoration: none;
-    color: #e6f1f5;
-    font-size: 18px;
-    font-weight: 500;
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255,255,255,0.08);
-    transition: all 0.3s ease;
-}
-
-.card-btn:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-}
-
-/* COLORES POR SECCIÓN */
-.instalaciones { background: linear-gradient(135deg, #0072ff, #00c6ff); }
-.averias { background: linear-gradient(135deg, #ff6a00, #ff3d00); }
-.planta {
-    background: linear-gradient(135deg, #00c9a7, #00ff9d);
-    font-weight: 600;
-    border: 1px solid rgba(255,255,255,0.15);
-}
-
-.planta:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-}
-
-/* FORM */
-form {
-    display: grid;
-    gap: 12px;
-    margin-top: 20px;
-}
-
-/* INPUTS */
-input {
-    padding: 12px;
-    border-radius: 10px;
-    border: none;
-    outline: none;
-}
-
-/* BOTONES */
-button {
-    padding: 12px;
-    border-radius: 10px;
-    border: none;
-    background: linear-gradient(45deg, #00c6ff, #0072ff);
-    color: white;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-button:hover {
-    transform: scale(1.05);
-}
-
-/* HISTORIAL */
-#historial {
-    margin-top: 30px;
-    display: grid;
-    gap: 15px;
-}
-
-/* TARJETAS */
-.card {
-    background: rgba(255,255,255,0.08);
-    padding: 15px;
-    border-radius: 12px;
-    text-align: left;
-    border-left: 4px solid #00c6ff;
-    backdrop-filter: blur(5px);
-}
-
-/* RESPONSIVE */
-@media (max-width: 600px) {
-    .title-logo {
-        flex-direction: column;
-        font-size: 1.8rem;
-    }
-    .logo-inline { width: 50px; }
-    h1 { font-size: 1.8rem; }
+    position: relative;
 }
 
 /* FORMULARIO TIPO GRID */
 .form-grid {
     display: grid;
-    grid-template-columns: 150px 1fr;
-    gap: 12px 20px;
+    grid-template-columns: 160px 1fr;
+    gap: 15px 25px;
     margin-top: 20px;
     align-items: center;
+    text-align: left;
+}
+
+.form-grid label {
+    font-weight: 600;
+    color: #00c6ff; /* Celeste del logo para las etiquetas */
 }
 
 .form-grid input[type="text"],
 .form-grid input[type="number"] {
-    padding: 10px;
+    padding: 12px;
     border-radius: 8px;
-    border: 1px solid rgba(255,255,255,0.3);
+    border: 1px solid rgba(0, 198, 255, 0.2);
     width: 100%;
-    background: rgba(255,255,255,0.05);
-    color: #e6f1f5;
+    background: rgba(255, 255, 255, 0.05);
+    color: #ffffff;
+    outline: none;
+    transition: 0.3s;
+}
+
+.form-grid input:focus {
+    border-color: #00c6ff;
+    box-shadow: 0 0 10px rgba(0, 198, 255, 0.2);
 }
 
 .form-grid input[type="checkbox"] {
-    transform: scale(1.2);
+    transform: scale(1.4);
     justify-self: start;
     cursor: pointer;
+    accent-color: #00c6ff;
 }
 
-/* BOTONES ACCIÓN */
+/* BOTONES */
+button {
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(45deg, #0072ff, #00c6ff);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 198, 255, 0.4);
+}
+
+/* BOTONES ACCIÓN (EXCEL Y VOLVER) */
 .action-buttons {
-    margin: 15px 0;
+    margin: 25px 0;
     display: flex;
     gap: 15px;
     justify-content: center;
@@ -222,6 +150,32 @@ button:hover {
     background: linear-gradient(45deg, #4b6cb7, #182848) !important;
 }
 
-#volver-fantasma {
-    display: none !important;
+/* HISTORIAL Y TARJETAS */
+#historial {
+    margin-top: 35px;
+    display: grid;
+    gap: 15px;
 }
+
+.card {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 20px;
+    border-radius: 15px;
+    text-align: left;
+    border-left: 5px solid #00c6ff; /* Borde celeste WNTV */
+    backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .title-logo h1 { font-size: 2.2rem; }
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    .form-grid label { margin-bottom: -5px; }
+    .title-logo { flex-direction: column; }
+}
+
+#volver-fantasma { display: none !important; }
