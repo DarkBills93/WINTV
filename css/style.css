@@ -24,11 +24,14 @@ body::after {
 
 /* LOGO ESCALADO */
 .logo-principal {
-    width: 220px; /* Tamaño profesional */
+    width: 220px; 
     height: auto;
-    margin-bottom: 10px;
+    display: block;
+    margin: 0 auto 10px auto;
     filter: drop-shadow(0 0 8px rgba(0, 198, 255, 0.4));
 }
+
+.header { text-align: center; padding-top: 20px; }
 
 /* TÍTULO NEÓN */
 h1 {
@@ -66,6 +69,7 @@ input[type="text"], input[type="number"] {
     border: 1px solid rgba(255,255,255,0.2);
     background: rgba(0,0,0,0.3);
     color: #fff;
+    outline: none;
 }
 
 /* ALINEACIÓN CHECKBOXES */
@@ -81,7 +85,7 @@ input[type="checkbox"] {
     accent-color: #00c6ff;
 }
 
-/* BOTONES */
+/* BOTÓN GUARDAR NEÓN (CORREGIDO) */
 .btn-guardar {
     grid-column: 1 / span 2;
     padding: 15px;
@@ -90,10 +94,19 @@ input[type="checkbox"] {
     border-radius: 12px;
     color: white;
     font-weight: bold;
+    font-size: 1rem;
     cursor: pointer;
-    margin-top: 10px;
+    margin-top: 15px;
+    box-shadow: 0 0 10px rgba(0, 198, 255, 0.3);
+    transition: 0.3s;
 }
 
+.btn-guardar:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 20px rgba(0, 198, 255, 0.5);
+}
+
+/* BOTONES ACCIÓN */
 .action-buttons {
     display: flex;
     gap: 15px;
@@ -101,8 +114,8 @@ input[type="checkbox"] {
     margin-bottom: 30px;
 }
 
-.btn-excel { background: #28a745; color: white; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; }
-.btn-back { background: #4b6cb7; color: white; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; }
+.btn-excel { background: #28a745; color: white; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; }
+.btn-back { background: #4b6cb7; color: white; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; }
 
 /* HISTORIAL */
 .card {
