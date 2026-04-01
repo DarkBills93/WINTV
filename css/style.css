@@ -1,15 +1,17 @@
-/* RESET Y FONDO */
+/* RESET Y FONDO GLOBAL */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
     font-family: 'Segoe UI', sans-serif;
     color: #e6f1f5;
-    background-color: #0d1b2a;
     min-height: 100vh;
     position: relative;
+    overflow-x: hidden;
+    /* --- NUEVO FONDO PARA PLANTA EXTERNA (AZUL PROFUNDO A NEGRO MATE) --- */
+    background: linear-gradient(180deg, #0d1b2a 0%, #081017 100%); 
 }
 
-/* Marca de Agua */
+/* Marca de Agua Sutil */
 body::after {
     content: "";
     position: fixed;
@@ -17,34 +19,66 @@ body::after {
     z-index: -1;
     background-image: url('../img/logo.png');
     background-repeat: repeat;
-    background-size: 150px;
-    opacity: 0.04;
+    background-position: center;
+    background-size: 140px;
+    opacity: 0.03; /* Aún más sutil para el nuevo fondo */
     pointer-events: none;
 }
 
-/* LOGO ESCALADO */
-.logo-principal {
-    width: 220px; 
+/* --- CORRECCIÓN DEL LOGO PRINCIPAL (MENÚ PRINCIPAL Y CABECERAS) --- */
+.header img, .logo-principal {
+    width: 200px; /* Tamaño controlado para evitar el logo gigante */
     height: auto;
     display: block;
-    margin: 0 auto 10px auto;
-    filter: drop-shadow(0 0 8px rgba(0, 198, 255, 0.4));
+    margin: 20px auto 10px auto;
+    filter: drop-shadow(0 0 10px rgba(0, 198, 255, 0.4));
 }
 
-.header { text-align: center; padding-top: 20px; }
+.header { text-align: center; }
 
-/* TÍTULO NEÓN */
+/* TÍTULOS CON EFECTO NEÓN */
 h1 {
-    font-size: 2.2rem;
+    font-size: 2.3rem;
     text-transform: uppercase;
     color: #fff;
-    text-shadow: 0 0 10px #00c6ff, 0 0 20px #00c6ff;
-    margin-bottom: 20px;
+    text-shadow: 0 0 8px #00c6ff, 0 0 15px #00c6ff;
+    margin-bottom: 25px;
 }
 
-/* FORMULARIO */
+/* --- RESTAURACIÓN DEL MENÚ DE TARJETAS (PÁGINA PRINCIPAL) --- */
+.menu {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 30px 0;
+}
+
+.card-btn {
+    padding: 20px 35px;
+    border-radius: 15px;
+    text-decoration: none;
+    color: white;
+    font-weight: 600;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Colores originales de tus tarjetas */
+.instalaciones { background: linear-gradient(135deg, #0072ff, #00c6ff); }
+.averias { background: linear-gradient(135deg, #ff6a00, #ff3d00); }
+.planta { background: linear-gradient(135deg, #00c9a7, #00ff9d); }
+
+.card-btn:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 20px rgba(0, 198, 255, 0.3);
+}
+
+/* --- FORMULARIO PLANTA EXTERNA (CONTRALTE MEJORADO) --- */
 .form-container {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.06);
     padding: 25px;
     border-radius: 20px;
     border: 1px solid rgba(0, 198, 255, 0.3);
@@ -64,6 +98,7 @@ h1 {
 label { color: #00c6ff; font-weight: 600; }
 
 input[type="text"], input[type="number"] {
+    width: 100%;
     padding: 10px;
     border-radius: 8px;
     border: 1px solid rgba(255,255,255,0.2);
@@ -72,7 +107,9 @@ input[type="text"], input[type="number"] {
     outline: none;
 }
 
-/* ALINEACIÓN CHECKBOXES */
+input:focus { border-color: #00c6ff; }
+
+/* Alineación Checkboxes (Mantenido) */
 .checkbox-group {
     display: flex;
     justify-content: flex-start;
@@ -85,7 +122,7 @@ input[type="checkbox"] {
     accent-color: #00c6ff;
 }
 
-/* BOTÓN GUARDAR NEÓN (CORREGIDO) */
+/* Botón Guardar (Mantenido Neón) */
 .btn-guardar {
     grid-column: 1 / span 2;
     padding: 15px;
@@ -94,19 +131,10 @@ input[type="checkbox"] {
     border-radius: 12px;
     color: white;
     font-weight: bold;
-    font-size: 1rem;
     cursor: pointer;
-    margin-top: 15px;
-    box-shadow: 0 0 10px rgba(0, 198, 255, 0.3);
     transition: 0.3s;
 }
 
-.btn-guardar:hover {
-    transform: scale(1.02);
-    box-shadow: 0 0 20px rgba(0, 198, 255, 0.5);
-}
-
-/* BOTONES ACCIÓN */
 .action-buttons {
     display: flex;
     gap: 15px;
@@ -114,10 +142,10 @@ input[type="checkbox"] {
     margin-bottom: 30px;
 }
 
-.btn-excel { background: #28a745; color: white; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; }
-.btn-back { background: #4b6cb7; color: white; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; }
+.btn-excel { background: #28a745; color: white; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; }
+.btn-back { background: #4b6cb7; color: white; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; }
 
-/* HISTORIAL */
+/* Historial */
 .card {
     background: rgba(255, 255, 255, 0.05);
     padding: 15px;
