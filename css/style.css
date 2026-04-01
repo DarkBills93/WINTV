@@ -69,7 +69,7 @@ h1 {
 /* Colores originales de tus tarjetas */
 .instalaciones { background: linear-gradient(135deg, #0072ff, #00c6ff); }
 .averias { background: linear-gradient(135deg, #ff6a00, #ff3d00); }
-.planta { background: linear-gradient(135deg, #00c9a7, #449c7a); }
+.planta { background: linear-gradient(135deg, #059669, #10b981); }
 
 .card-btn:hover {
     transform: translateY(-5px);
