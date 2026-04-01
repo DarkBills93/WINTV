@@ -7,6 +7,12 @@ document.addEventListener("DOMContentLoaded", () => {
         form.addEventListener("submit", function(e) {
             e.preventDefault();
 
+            // Validación simple: al menos un campo debe tener texto
+            if(!document.getElementById("preformados").value && !document.getElementById("splitter").value) {
+                alert("⚠️ Por favor, completa al menos los campos principales.");
+                return;
+            }
+
             const data = {
                 preformados: document.getElementById("preformados").value,
                 splitter: document.getElementById("splitter").value,
@@ -30,6 +36,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
+// FUNCIÓN PARA VOLVER AL MENÚ
+function volver() {
+    // Asegúrate de que index.html sea tu archivo principal
+    window.location.href = "index.html"; 
+}
+
 /* HISTORIAL */
 function cargarHistorial() {
     const contenedor = document.getElementById("historial");
@@ -37,20 +49,22 @@ function cargarHistorial() {
 
     contenedor.innerHTML = "";
 
-    registros.forEach((item, index) => {
+    // Invertimos el array para que lo más reciente aparezca arriba
+    [...registros].reverse().forEach((item, index) => {
+        // Calculamos el index real para la función eliminar
+        const realIndex = registros.length - 1 - index;
+        
         contenedor.innerHTML += `
             <div class="card">
                 <p><b>📅 ${item.fecha}</b></p>
-                <p>Preformados: ${item.preformados}</p>
-                <p>Splitter: ${item.splitter}</p>
-                <p>Fibra: ${item.fibra}</p>
+                <p><b>Materiales:</b> Preformados: ${item.preformados || '-'} | Splitter: ${item.splitter || '-'} | Hilos: ${item.fibra || '0'}</p>
                 <p>
                     ${item.empalmadora ? "✔️ Empalmadora" : ""}
                     ${item.manguitas ? " ✔️ Manguitas" : ""}
                     ${item.cortadora ? " ✔️ Cortadora" : ""}
                     ${item.fibraActiva ? " ✔️ Fibra Activa" : ""}
                 </p>
-                <button onclick="eliminar(${index})">🗑 Eliminar</button>
+                <button onclick="eliminar(${realIndex})" style="background: #ff4d4d; margin-top:10px; padding: 5px 15px;">🗑 Eliminar</button>
             </div>
         `;
     });
@@ -66,21 +80,28 @@ function eliminar(index) {
     cargarHistorial();
 }
 
-/* EXPORTAR A EXCEL */
+/* EXPORTAR A EXCEL (Mejorado con XLSX) */
 function exportarExcel() {
     let registros = JSON.parse(localStorage.getItem("planta")) || [];
+    if (registros.length === 0) {
+        alert("No hay datos para exportar");
+        return;
+    }
 
-    let contenido = "Fecha,Preformados,Splitter,Fibra\n";
+    // Convertir booleanos a texto para el Excel
+    const datosProcesados = registros.map(r => ({
+        Fecha: r.fecha,
+        Preformados: r.preformados,
+        Splitter: r.splitter,
+        Hilos_Fibra: r.fibra,
+        Empalmadora: r.empalmadora ? "SÍ" : "NO",
+        Manguitas: r.manguitas ? "SÍ" : "NO",
+        Cortadora: r.cortadora ? "SÍ" : "NO",
+        Fibra_Activa: r.fibraActiva ? "SÍ" : "NO"
+    }));
 
-    registros.forEach(r => {
-        contenido += `${r.fecha},${r.preformados},${r.splitter},${r.fibra}\n`;
-    });
-
-    const blob = new Blob([contenido], { type: "text/csv" });
-    const url = window.URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "registros.csv";
-    a.click();
+    const ws = XLSX.utils.json_to_sheet(datosProcesados);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Planta Externa");
+    XLSX.writeFile(wb, "Reporte_Planta_Externa.xlsx");
 }
