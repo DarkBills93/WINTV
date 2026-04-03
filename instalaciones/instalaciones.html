@@ -1,45 +1,78 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instalaciones</title>
+    <title>Instalaciones — WinTV</title>
     <link rel="stylesheet" href="estilo.css">
     <script src="jscr.js" defer></script>
 </head>
 <body>
-    <div class="img">
-        <img src="../img/logo.png" alt="logowintv">
+
+    <div class="logo-area">
+        <div class="img">
+            <img src="../img/logo.png" alt="logowintv" width="250px">
+        </div>
+        
     </div>
-    <div class="contenido">
+
+    <main class="contenido">
+
         <div id="encabezado">
             <h1>Materiales para Instalaciones</h1>
         </div>
 
         <form id="instamat">
 
-            <label class="fila">Conectores Mecanicos <input type="number" id="mecanico" placeholder="cantidad"></label>
-            <label class="fila">Conectores RG6 <input type="number" id="rg6" placeholder="cantidad"></label>
-            <label class="fila">Coaxial <input type="number" id="coaxial" placeholder="metros"></label>
-            <label class="fila">Fibra Drop <input type="number" id="drop" placeholder="metros"> </label>
-
-            <div class="marcar">
-                <label class="marcar"> <input type="checkbox" id="contrato" > Contratos</label>
-                <label class="marcar"> <input type="checkbox" id="grapas" > Grapas</label>
-                <label class="marcar"> <input type="checkbox" id="duo" > Equipos Duo </label>
-                <label class="marcar"> <input type="checkbox" id="internet" > Equipos solo Internet </label>
-                <label class="marcar"> <input type="checkbox" id="cable"> Equipos solo cable </label>
-                <label class="marcar"> <input type="checkbox" id="wincha" > Wincha Pasacable </label>
+            <div class="field-group">
+                <label for="mecanico">Conectores Mecánicos</label>
+                <input type="number" id="mecanico" placeholder="cantidad" min="0">
             </div>
 
-            <button type="submit">Registrar</button><BR>
-            <button class="export" onclick="exportarCSV()">Exportar a Excel</button>
+            <div class="field-group">
+                <label for="rg6">Conectores RG6</label>
+                <input type="number" id="rg6" placeholder="cantidad" min="0">
+            </div>
 
-        
+            <div class="field-group">
+                <label for="coaxial">Coaxial</label>
+                <input type="number" id="coaxial" placeholder="metros" min="0">
+            </div>
+
+            <div class="field-group">
+                <label for="drop">Fibra Drop</label>
+                <input type="number" id="drop" placeholder="metros" min="0">
+            </div>
+
+            <hr class="divider">
+
+            <div class="checks-wrap">
+                <label class="check-label"><input type="checkbox" id="contrato"> Contratos</label>
+                <label class="check-label"><input type="checkbox" id="grapas"> Grapas</label>
+                <label class="check-label"><input type="checkbox" id="duo"> Equipos Duo</label>
+                <label class="check-label"><input type="checkbox" id="internet"> Solo Internet</label>
+                <label class="check-label"><input type="checkbox" id="cable"> Solo Cable</label>
+                <label class="check-label"><input type="checkbox" id="wincha"> Wincha Pasacable</label>
+            </div>
+
+            <div class="btn-row">
+                <button type="submit">Registrar</button>
+                <button type="button" class="btn-secondary" onclick="exportarCSV()">Exportar a Excel</button>
+            </div>
+
         </form>
-        <h2>Registro</h2>
-        <div id="registro"></div>
-           <button onclick="volver()">Atras</button>
+
+        <section class="registro-section">
+            <h2>Registro</h2>
+            <div id="registro"></div>
+        </section>
+
+        <div class="back-row">
+            <button type="button" class="btn-back" onclick="volver()">← Atrás</button>
+        </div>
+
+    </main>
+
+</button>
          </div>
     
 </body>
