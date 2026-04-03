@@ -1,3 +1,7 @@
+
+console.log('%c🔧 ¡Hola!', 'color: #ff6b6b; font-size: 20px; font-weight: bold');
+console.log('%cCreador: Dany CB.', 'color: #0f3bcc; font-size: 14px');
+
 function volver() {
     window.location.href = "../index.html";
 }
@@ -92,6 +96,10 @@ function mostrarRegistros() {
 
 /* ── Eliminar registro ── */
 function eliminarRegistro(index) {
+    const confirmar = confirm(`¿Eliminar el Registro #${index + 1}?\nEsta acción no se puede deshacer.`);
+    
+    if (!confirmar) return;
+
     const registros = getData();
     registros.splice(index, 1);
     saveData(registros);
