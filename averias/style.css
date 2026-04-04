@@ -15,6 +15,7 @@ h1, h2 {
     text-align: center;
 }
 
+/* ───── TARJETAS ───── */
 .card {
     background: #1e2a33;
     padding: 20px;
@@ -23,6 +24,7 @@ h1, h2 {
     margin-bottom: 20px;
 }
 
+/* ───── GRID INPUTS ───── */
 .grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -33,18 +35,28 @@ input {
     padding: 10px;
     border: none;
     border-radius: 6px;
+    outline: none;
 }
 
+input:focus {
+    box-shadow: 0 0 0 2px #00c6ff55;
+}
+
+/* ───── CHECKBOX ───── */
 .checkbox-group {
     margin-top: 15px;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
 }
 
 .checkbox-group label {
-    margin-bottom: 5px;
+    background: #2b3e4a;
+    padding: 8px;
+    border-radius: 6px;
 }
 
+/* ───── BOTONES ───── */
 button {
     margin-top: 15px;
     padding: 10px;
@@ -52,6 +64,7 @@ button {
     border-radius: 8px;
     cursor: pointer;
     font-weight: bold;
+    transition: 0.2s;
 }
 
 .btn-primary {
@@ -67,9 +80,17 @@ button {
     background: #555;
     color: white;
     display: block;
-    margin: 20px auto;
+    margin: 10px auto;
 }
 
+.btn-danger {
+    background: #ff4d4d;
+    color: white;
+    display: block;
+    margin: 10px auto;
+}
+
+/* ───── HISTORIAL ───── */
 .historial {
     background: #1e2a33;
     padding: 15px;
@@ -78,16 +99,84 @@ button {
 
 .registro-item {
     background: #2b3e4a;
-    padding: 10px;
+    padding: 12px;
     margin-bottom: 10px;
     border-radius: 8px;
+    border-left: 4px solid #00c6ff;
 }
 
+/* encabezado del registro */
+.reg-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+/* grid interno */
+.reg-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 5px;
+}
+
+.reg-row span {
+    color: #00c6ff;
+    font-weight: bold;
+}
+
+/* botón eliminar */
+.btn-del {
+    background: #ff4d4d;
+    color: white;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+
+/* ───── ANIMACIÓN ───── */
 .fade-in {
-    animation: aparecer 0.6s ease-in;
+    animation: aparecer 0.5s ease-in;
 }
 
 @keyframes aparecer {
     from {opacity: 0; transform: translateY(10px);}
     to {opacity: 1; transform: translateY(0);}
+}
+
+/* ───── FILTRO ───── */
+.filtro-fechas {
+    background: #1e2a33;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+
+.filtro-fechas input {
+    padding: 8px;
+    border-radius: 6px;
+    border: none;
+}
+
+/* ───── TOTALES ───── */
+.totales {
+    background: #1e2a33;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+}
+
+.total-item {
+    background: #2b3e4a;
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: bold;
+    border-bottom: 3px solid #00c6ff;
 }

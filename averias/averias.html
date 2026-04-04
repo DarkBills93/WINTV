@@ -4,38 +4,62 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Averías</title>
-    <link rel="stylesheet" href="/averias/style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    
 
 <div class="container fade-in">
     <h1>🔧 Materiales de Averías</h1>
 
-    <form id="formAverias">
-        <input type="number" id="conectorMecanico" placeholder="Conectores Mecánicos">
-        <input type="number" id="rg6" placeholder="Conectores RG6">
-        <input type="number" id="coaxial" placeholder="Coaxial (metros)">
-        <input type="number" id="drop" placeholder="Fibra Drop (metros)">
-        <input type="number" id="fuente" placeholder="Fuentes">
-        <input type="number" id="router" placeholder="Routers / Modems">
+    <form id="formAverias" class="card">
 
-        <label><input type="checkbox" id="grapas"> Grapas</label>
-        <label><input type="checkbox" id="wincha"> Wincha Pasacable</label>
-        <label><input type="checkbox" id="empalmadora"> Empalmadora</label>
-        <label><input type="checkbox" id="manguitas"> Manguitas</label>
-        <label><input type="checkbox" id="cortadora"> Cortadora</label>
-        <label><input type="checkbox" id="tester"> Tester / Probador</label>
+        <div class="grid">
+            <input type="number" id="conectorMecanico" placeholder="Conectores Mecánicos">
+            <input type="number" id="rg6" placeholder="Conectores RG6">
+            <input type="number" id="coaxial" placeholder="Coaxial (metros)">
+            <input type="number" id="drop" placeholder="Fibra Drop (metros)">
+            <input type="number" id="fuente" placeholder="Fuentes">
+            <input type="number" id="router" placeholder="Routers / Modems">
+        </div>
 
-        <button type="submit">💾 Guardar</button>
+        <div class="checkbox-group">
+            <label><input type="checkbox" id="grapas"> Grapas</label>
+            <label><input type="checkbox" id="wincha"> Wincha</label>
+            <label><input type="checkbox" id="empalmadora"> Empalmadora</label>
+            <label><input type="checkbox" id="manguitas"> Manguitas</label>
+            <label><input type="checkbox" id="cortadora"> Cortadora</label>
+            <label><input type="checkbox" id="tester"> Tester</label>
+        </div>
+
+        <button type="submit" class="btn-primary">💾 Guardar</button>
     </form>
 
-    <h2>📋 Historial</h2>
-    <div id="historial"></div>
+    <div class="filtro-fechas">
+    <label>Desde:</label>
+    <input type="date" id="fechaInicio">
 
-    <br>
-    <button type="button" onclick="volver()">⬅ Volver</button>
+    <label>Hasta:</label>
+    <input type="date" id="fechaFin">
+
+    <button class="btn-primary" onclick="filtrarPorFecha()">🔍 Filtrar</button>
+    <button class="btn-secondary" onclick="limpiarFiltro()">❌ Limpiar</button>
+</div>
+<h2>📊 Totales</h2>
+<div id="totales" class="totales"></div>
+<h2>📈 Gráfico de Materiales</h2>
+<canvas id="graficoMateriales"></canvas>
+
+    <h2>📋 Historial</h2>
+    <div id="historial" class="historial"></div>
+
+    <button class="btn-danger" onclick="borrarHistorial()">🗑 Borrar historial</button>
+    <button class="btn-secondary" onclick="volver()">⬅ Volver</button>
+    <button class="btn-primary" onclick="exportarExcel()">📊 Exportar a Excel</button>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <script src="averias.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </body>
 </html>
