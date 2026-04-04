@@ -2,35 +2,56 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Planta Externa</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Planta Externa - WNTV</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
 <div class="container fade-in">
-    <h1>🌐 Materiales de Planta Externa</h1>
+    <div class="header">
+        <img src="img/logo.png" alt="Logo WNTV" class="logo-principal">
+        <h1>Materiales de Planta Externa</h1>
+    </div>
 
-    <form id="formPlanta">
+    <div class="form-container">
+        <form id="formPlanta" class="form-grid">
+            <label for="preformados">Preformados:</label>
+            <input type="text" id="preformados" placeholder="Color">
 
-        <input type="text" id="preformados" placeholder="Preformados (color)">
-        <input type="text" id="splitter" placeholder="Splitter (1x8 o 1x16)">
-        <input type="number" id="fibra" placeholder="Fibra (hilos)">
+            <label for="splitter">Splitter:</label>
+            <input type="text" id="splitter" placeholder="1x8 o 1x16">
 
-        <label><input type="checkbox" id="empalmadora"> Empalmadora</label>
-        <label><input type="checkbox" id="manguitas"> Manguitas</label>
-        <label><input type="checkbox" id="cortadora"> Cortadora</label>
-        <label><input type="checkbox" id="fibraActiva"> Fibra Activa</label>
+            <label for="fibra">Fibra:</label>
+            <input type="number" id="fibra" placeholder="Cantidad de hilos">
 
-        <button type="submit">💾 Guardar</button>
-    </form>
+            <label for="empalmadora">Empalmadora:</label>
+            <div class="checkbox-group"><input type="checkbox" id="empalmadora"></div>
 
-    <h2>📋 Historial</h2>
-    <div id="historial"></div>
+            <label for="manguitas">Manguitas:</label>
+            <div class="checkbox-group"><input type="checkbox" id="manguitas"></div>
 
-    <br>
-    <button onclick="volver()">⬅ Volver</button>
+            <label for="cortadora">Cortadora:</label>
+            <div class="checkbox-group"><input type="checkbox" id="cortadora"></div>
+
+            <label for="fibraActiva">Fibra Activa:</label>
+            <div class="checkbox-group"><input type="checkbox" id="fibraActiva"></div>
+
+            <button type="submit" class="btn-guardar">💾 Guardar Registro</button>
+        </form>
+    </div>
+
+    <div class="action-buttons">
+        <button onclick="exportarExcel()" class="btn-excel">📤 Exportar a Excel</button>
+        <button onclick="volver()" class="btn-back">⬅ Volver</button>
+    </div>
+
+    <div class="history-section">
+        <h2>📋 Historial de Planta Externa</h2>
+        <div id="historial"></div>
+    </div>
 </div>
 
-<script src="script.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="js/script.js"></script>
 </body>
 </html>
