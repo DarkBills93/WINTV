@@ -8,7 +8,7 @@ body {
     position: relative;
     overflow-x: hidden;
     /* FONDO PLANTA EXTERNA (AZUL PROFUNDO A NEGRO MATE) */
-    background: linear-gradient(180deg, #0d1b2a 0%, #081017 100%); 
+    background: linear-gradient(344deg, #000000, #022b50, #000000);
 }
 
 /* Marca de Agua Sutil */
