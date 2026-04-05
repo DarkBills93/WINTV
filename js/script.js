@@ -1,3 +1,13 @@
+const pagina = window.location.pathname;
+
+if (pagina.includes('index.html')) {
+    console.log('%cCreado por Soporte WINTV', 'color: #000000; font-size: 20px; font-weight: bold');
+} else if (pagina.includes('planta.html')) {
+    console.log('%cCreado por JC', 'color: #ff0101; font-size: 15px; font-weight: bold');
+}
+
+
+
 document.addEventListener("DOMContentLoaded", () => {
     const form = document.getElementById("formPlanta");
     if (form) {
