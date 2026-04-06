@@ -4,6 +4,63 @@
     margin: 0;
     padding: 0;
 }
+ 
+
+@keyframes paginaEntrada {
+    0%   { opacity: 0; transform: translateY(18px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+ 
+@keyframes logoEntrada {
+    0%   { opacity: 0; transform: scale(0.88); }
+    60%  { opacity: 1; transform: scale(1.03); }
+    100% { opacity: 1; transform: scale(1); }
+}
+ 
+@keyframes fadeDown {
+    0%   { opacity: 0; transform: translateY(-10px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+ 
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #0d5472, #224855, #001016);
+    color: #ffffff;
+    min-height: 100vh;
+    padding: 28px 16px;
+}
+ 
+
+.logo-area {
+    animation: logoEntrada 0.6s ease both;
+}
+ 
+
+#encabezado {
+    animation: fadeDown 0.5s ease 0.3s both;
+}
+ 
+
+#instamat {
+    animation: paginaEntrada 0.55s ease 0.45s both;
+}
+ 
+.registro-section {
+    animation: paginaEntrada 0.55s ease 0.55s both;
+}
+ 
+.back-row {
+    animation: paginaEntrada 0.4s ease 0.6s both;
+}
+ 
+
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
 
 body {
