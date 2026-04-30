@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Soporte Nocturno - WNTV</title>
-    <!-- Ruta corregida para salir de la carpeta y entrar a css -->
     <link rel="stylesheet" href="../css/style.css">
     <style>
         .hidden { display: none; }
@@ -28,12 +27,20 @@
             padding: 10px;
             font-family: inherit;
         }
+        .status-badge { float: right; font-size: 1.2em; }
+        .monitor-item {
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <!-- Ruta corregida para el logo -->
             <img src="../img/logo.png" alt="Logo WNTV" class="logo-principal" style="width: 270px;">
             <h1 class="neon-text">Soporte Nocturno</h1>
         </div>
@@ -54,22 +61,28 @@
             <h2 style="color: #00c6ff;">⚙️ Panel Administrador</h2>
             <div class="form-container">
                 <input type="text" id="nombre-cliente" placeholder="Nombre del Cliente o Usuario">
-                <button onclick="agregarCliente()" class="btn-guardar" style="margin-top: 15px; width: 100%;">Añadir a la Lista de Hoy</button>
+                <button onclick="agregarCliente()" class="btn-guardar" style="margin-top: 15px; width: 100%;">Añadir a la Lista</button>
             </div>
+            
+            <div class="form-container" style="margin-top: 20px;">
+                <h3 style="color: #00c6ff; margin-bottom: 10px;">📊 Monitoreo de Reportes</h3>
+                <div id="monitor-lista"></div>
+            </div>
+
             <button onclick="logout()" class="btn-back" style="margin-top: 20px;">Cerrar Sesión</button>
         </div>
 
         <!-- PANEL TÉCNICO -->
         <div id="user-panel" class="user-panel hidden">
             <h2 style="color: #00c6ff;">📝 Registro de Actividades</h2>
-            <div id="lista-clientes-soporte">
-                <!-- Se llena dinámicamente -->
+            <div id="lista-clientes-soporte"></div>
+            
+            <div class="action-buttons" style="margin-top: 20px; display: flex; gap: 10px;">
+                <button onclick="guardarTodoElSoporte()" class="btn-guardar" style="flex: 1;">💾 Guardar Todo el Registro</button>
+                <button onclick="logout()" class="btn-back">Volver</button>
             </div>
-            <button onclick="logout()" class="btn-back" style="margin-top: 20px;">Volver al Menú</button>
         </div>
     </div>
-
-    <!-- El script está en la misma carpeta -->
     <script src="soporte.js"></script>
 </body>
 </html>
