@@ -7,6 +7,7 @@ setInterval(() => {
     if (panelAbierto !== "") {
         clientesNocturnos = JSON.parse(localStorage.getItem('clientesNocturnos')) || [];
         historialNocturno = JSON.parse(localStorage.getItem('historialNocturno')) || [];
+        
         if (panelAbierto === "admin") actualizarMonitorAdmin();
         if (panelAbierto === "tecnico") {
             const borradores = {};
@@ -82,35 +83,18 @@ function eliminarPendiente(i) {
     }
 }
 
-// 3. EXPORTAR PDF (INFORME PROFESIONAL)
+// 3. EXPORTAR PDF
 function exportarPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-    
     doc.setFontSize(18);
     doc.setTextColor(0, 198, 255);
     doc.text("INFORME DE SOPORTE NOCTURNO - WNTV", 105, 20, { align: 'center' });
-    
     doc.setFontSize(12);
-    doc.setTextColor(100);
     doc.text(`Fecha de Reporte: ${new Date().toLocaleString()}`, 15, 30);
-
-    const filas = historialNocturno.map(h => [
-        h.fecha,
-        h.tecnico,
-        h.usuario,
-        h.reporte
-    ]);
-
-    doc.autoTable({
-        startY: 40,
-        head: [['Fecha/Hora', 'Técnico', 'Cliente', 'Fundamento del Soporte']],
-        body: filas,
-        headStyles: { fillColor: [0, 114, 255] },
-        theme: 'striped'
-    });
-
-    doc.save(`Informe_Soporte_Nocturno_${new Date().toLocaleDateString()}.pdf`);
+    const filas = historialNocturno.map(h => [h.fecha, h.tecnico, h.usuario, h.reporte]);
+    doc.autoTable({ startY: 40, head: [['Fecha/Hora', 'Técnico', 'Cliente', 'Fundamento']], body: filas });
+    doc.save(`Informe_Soporte_${new Date().toLocaleDateString()}.pdf`);
 }
 
 // 4. LÓGICA TÉCNICO
@@ -118,20 +102,15 @@ function renderizarClientesTecnico() {
     const contenedor = document.getElementById('lista-clientes-soporte');
     contenedor.innerHTML = "";
     const pendientes = clientesNocturnos.filter(c => !c.guardado);
-    
     if(pendientes.length === 0) {
-        contenedor.innerHTML = "<p style='text-align:center; opacity:0.5;'>No hay usuarios nuevos por atender.</p>";
+        contenedor.innerHTML = "<p style='text-align:center; opacity:0.5;'>No hay usuarios pendientes.</p>";
         return;
     }
-
     clientesNocturnos.forEach((c, i) => {
         if(!c.guardado) {
             const div = document.createElement('div');
             div.className = "soporte-card";
-            div.innerHTML = `
-                <h3>👤 ${c.nombre} <small style="font-size:0.6em; opacity:0.6;">(${c.fechaIngreso})</small></h3>
-                <textarea id="texto-${i}" placeholder="Escriba la solucion brindada..."></textarea>
-            `;
+            div.innerHTML = `<h3>👤 ${c.nombre}</h3><textarea id="texto-${i}" placeholder="Escriba la solucion brindada..."></textarea>`;
             contenedor.appendChild(div);
         }
     });
@@ -140,22 +119,15 @@ function renderizarClientesTecnico() {
 function guardarTodoElSoporte() {
     const tecnico = document.getElementById('nombre-tecnico').value.trim();
     if(!tecnico) { alert("Por favor, ingrese su nombre."); return; }
-
     let huboCambio = false;
     clientesNocturnos.forEach((c, i) => {
         const textoArea = document.getElementById(`texto-${i}`);
         if(textoArea && textoArea.value.trim() !== "") {
-            historialNocturno.push({
-                tecnico: tecnico,
-                usuario: c.nombre,
-                reporte: textoArea.value.trim(),
-                fecha: new Date().toLocaleString()
-            });
+            historialNocturno.push({ tecnico, usuario: c.nombre, reporte: textoArea.value.trim(), fecha: new Date().toLocaleString() });
             clientesNocturnos[i].guardado = true;
             huboCambio = true;
         }
     });
-
     if(huboCambio) {
         localStorage.setItem('historialNocturno', JSON.stringify(historialNocturno));
         localStorage.setItem('clientesNocturnos', JSON.stringify(clientesNocturnos));
@@ -165,18 +137,33 @@ function guardarTodoElSoporte() {
     }
 }
 
+// Historial con botón de Papelera funcional
 function mostrarHistorial() {
     const contenedor = document.getElementById('log-historial-nocturno');
+    if (!contenedor) return;
     contenedor.innerHTML = "";
-    [...historialNocturno].reverse().forEach((log) => {
+    [...historialNocturno].reverse().forEach((log, i) => {
+        const realIndex = historialNocturno.length - 1 - i;
         const div = document.createElement('div');
-        div.className = "soporte-card";
-        div.style.borderLeftColor = "#28a745";
+        div.className = "soporte-card historial-item";
         div.innerHTML = `
-            <small>${log.fecha}</small><br>
-            <b>Técnico:</b> ${log.tecnico} | <b>Cliente:</b> ${log.usuario}<br>
-            <p style="margin-top:10px; font-style:italic;">"${log.reporte}"</p>
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                <div>
+                    <small>${log.fecha}</small><br>
+                    <b>Técnico:</b> ${log.tecnico} | <b>Cliente:</b> ${log.usuario}<br>
+                    <p style="margin-top:10px; font-style:italic;">"${log.reporte}"</p>
+                </div>
+                <button onclick="eliminarHistorial(${realIndex})" style="background:none; border:none; cursor:pointer; color:#ff4d4d; font-size:1.2em;">🗑️</button>
+            </div>
         `;
         contenedor.appendChild(div);
     });
+}
+
+function eliminarHistorial(index) {
+    if(confirm("¿Eliminar este registro del historial?")) {
+        historialNocturno.splice(index, 1);
+        localStorage.setItem('historialNocturno', JSON.stringify(historialNocturno));
+        mostrarHistorial();
+    }
 }
