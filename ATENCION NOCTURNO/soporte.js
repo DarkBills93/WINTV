@@ -46,7 +46,7 @@ setInterval(() => {
 
 // 1. CONTROL DE ACCESO
 function checkLogin() {
-    if(document.getElementById('pass-admin').value === "admin123") {
+    if(document.getElementById('pass-admin').value === "ANDREA2026") {
         document.getElementById('login-section').classList.add('hidden');
         document.getElementById('admin-panel').classList.remove('hidden');
         panelAbierto = "admin";
