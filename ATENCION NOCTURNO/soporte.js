@@ -1,12 +1,12 @@
 let clientesNocturnos = JSON.parse(localStorage.getItem('clientesNocturnos')) || [];
 let historialNocturno = JSON.parse(localStorage.getItem('historialNocturno')) || [];
 let ultimaFechaRef = localStorage.getItem('fechaLimpiezaNocturna') || "";
+let panelAbierto = ""; // Variable para saber qué panel refrescar
 
 // LIMPIEZA AUTOMÁTICA DIARIA SELECTIVA
 function verificarLimpiezaDiaria() {
     const hoy = new Date().toLocaleDateString();
     if (ultimaFechaRef !== hoy) {
-        // Se borra la lista de usuarios para el técnico, pero NO el historial
         clientesNocturnos = [];
         localStorage.setItem('clientesNocturnos', JSON.stringify(clientesNocturnos));
         localStorage.setItem('fechaLimpiezaNocturna', hoy);
@@ -15,11 +15,41 @@ function verificarLimpiezaDiaria() {
 }
 verificarLimpiezaDiaria();
 
+// --- SISTEMA DE SINCRONIZACIÓN AUTOMÁTICA (CADA 5 SEGUNDOS) ---
+setInterval(() => {
+    // Solo refrescamos si hay un panel activo para no consumir recursos innecesarios
+    if (panelAbierto !== "") {
+        clientesNocturnos = JSON.parse(localStorage.getItem('clientesNocturnos')) || [];
+        historialNocturno = JSON.parse(localStorage.getItem('historialNocturno')) || [];
+
+        if (panelAbierto === "admin") {
+            actualizarMonitorAdmin();
+        } else if (panelAbierto === "tecnico") {
+            // Guardamos el contenido actual de los textareas para que el refresco no borre lo que el técnico está escribiendo
+            const borradores = {};
+            clientesNocturnos.forEach((c, i) => {
+                const el = document.getElementById(`texto-${i}`);
+                if (el) borradores[i] = el.value;
+            });
+
+            renderizarClientesTecnico();
+            mostrarHistorial();
+
+            // Restauramos lo que el técnico estaba escribiendo
+            clientesNocturnos.forEach((c, i) => {
+                const el = document.getElementById(`texto-${i}`);
+                if (el && borradores[i] !== undefined) el.value = borradores[i];
+            });
+        }
+    }
+}, 5000); // 5000ms = 5 segundos
+
 // 1. CONTROL DE ACCESO
 function checkLogin() {
     if(document.getElementById('pass-admin').value === "admin123") {
         document.getElementById('login-section').classList.add('hidden');
         document.getElementById('admin-panel').classList.remove('hidden');
+        panelAbierto = "admin";
         actualizarMonitorAdmin();
     } else { alert("Contraseña incorrecta"); }
 }
@@ -27,6 +57,7 @@ function checkLogin() {
 function showUserPanel() {
     document.getElementById('login-section').classList.add('hidden');
     document.getElementById('user-panel').classList.remove('hidden');
+    panelAbierto = "tecnico";
     renderizarClientesTecnico();
     mostrarHistorial();
 }
@@ -93,7 +124,7 @@ function guardarTodoElSoporte() {
     let huboCambio = false;
     clientesNocturnos.forEach((c, i) => {
         const textoArea = document.getElementById(`texto-${i}`);
-        if(textoArea.value.trim() !== "") {
+        if(textoArea && textoArea.value.trim() !== "" && !c.guardado) {
             historialNocturno.push({
                 tecnico: tecnico,
                 usuario: c.nombre,
@@ -101,7 +132,7 @@ function guardarTodoElSoporte() {
                 fecha: new Date().toLocaleString()
             });
             clientesNocturnos[i].guardado = true;
-            textoArea.value = ""; // Limpia el textbox visualmente
+            textoArea.value = ""; 
             huboCambio = true;
         }
     });
@@ -117,6 +148,7 @@ function guardarTodoElSoporte() {
 
 function mostrarHistorial() {
     const contenedor = document.getElementById('log-historial-nocturno');
+    if (!contenedor) return;
     contenedor.innerHTML = "";
     [...historialNocturno].reverse().forEach((log, i) => {
         const realIndex = historialNocturno.length - 1 - i;
