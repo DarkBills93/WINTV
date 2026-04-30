@@ -245,3 +245,4 @@ input[type="checkbox"] {
     width: 90%;
     backdrop-filter: blur(5px);
 }
+.soporte-nocturno { background: linear-gradient(135deg, #434343 0%, #000000 100%); border: 1px solid #7000ff; }
