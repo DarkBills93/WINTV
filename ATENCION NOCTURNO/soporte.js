@@ -1,13 +1,14 @@
-// Simulación de base de datos local
+// Recuperamos datos guardados o iniciamos vacío
 let clientesNocturnos = JSON.parse(localStorage.getItem('clientesNocturnos')) || [];
 
+// 1. Manejo de Roles
 function checkLogin() {
     const pass = document.getElementById('pass-admin').value;
-    if(pass === "admin123") { // Puedes cambiar la clave aquí
+    if(pass === "admin123") { // Cambia esta clave a tu gusto
         document.getElementById('login-section').classList.add('hidden');
         document.getElementById('admin-panel').classList.remove('hidden');
     } else {
-        alert("Contraseña incorrecta");
+        alert("Contraseña de administrador incorrecta");
     }
 }
 
@@ -17,40 +18,59 @@ function showUserPanel() {
     renderizarClientes();
 }
 
+// 2. Funciones de Administrador
 function agregarCliente() {
-    const nombre = document.getElementById('nombre-cliente').value;
+    const nombreInput = document.getElementById('nombre-cliente');
+    const nombre = nombreInput.value.trim();
+    
     if(nombre) {
-        clientesNocturnos.push({ nombre: nombre, concepto: "" });
+        clientesNocturnos.push({ 
+            nombre: nombre, 
+            concepto: "", 
+            fecha: new Date().toLocaleString() 
+        });
         localStorage.setItem('clientesNocturnos', JSON.stringify(clientesNocturnos));
-        document.getElementById('nombre-cliente').value = "";
-        alert("Cliente agregado a la lista nocturna");
+        nombreInput.value = "";
+        alert("Cliente añadido: " + nombre);
+    } else {
+        alert("Por favor ingrese un nombre");
     }
 }
 
+// 3. Funciones de Técnico (Dinámico)
 function renderizarClientes() {
     const contenedor = document.getElementById('lista-clientes-soporte');
     contenedor.innerHTML = "";
+
+    if(clientesNocturnos.length === 0) {
+        contenedor.innerHTML = "<p style='text-align:center; opacity:0.5;'>No hay clientes asignados para hoy.</p>";
+        return;
+    }
 
     clientesNocturnos.forEach((cliente, index) => {
         const div = document.createElement('div');
         div.className = "soporte-card";
         div.innerHTML = `
-            <h3>👤 ${cliente.nombre}</h3>
-            <textarea id="concepto-${index}" placeholder="Redacte lo que hizo..." 
-                style="width:100%; height:80px; margin-top:10px; background:rgba(0,0,0,0.3); color:white; border-radius:8px; padding:10px; border:1px solid #7000ff;">${cliente.concepto}</textarea>
-            <button onclick="guardarSoporte(${index})" class="btn-guardar" style="margin-top:10px; padding:5px 15px;">💾 Guardar Concepto</button>
+            <h3 style="color: #fff; margin-bottom: 5px;">👤 ${cliente.nombre}</h3>
+            <small style="color: #00c6ff; opacity: 0.7;">Asignado el: ${cliente.fecha}</small>
+            <textarea id="concepto-${index}" placeholder="Redacte aquí el soporte realizado...">${cliente.concepto}</textarea>
+            <button onclick="guardarSoporte(${index})" class="btn-guardar" style="margin-top:10px; padding: 8px 20px; font-size: 0.9em;">
+                💾 Guardar para ${cliente.nombre}
+            </button>
         `;
         contenedor.appendChild(div);
     });
 }
 
 function guardarSoporte(index) {
-    const concepto = document.getElementById(`concepto-${index}`).value;
-    clientesNocturnos[index].concepto = concepto;
+    const texto = document.getElementById(`concepto-${index}`).value;
+    clientesNocturnos[index].concepto = texto;
     localStorage.setItem('clientesNocturnos', JSON.stringify(clientesNocturnos));
-    alert(`Guardado con éxito para: ${clientesNocturnos[index].nombre}`);
+    alert("Concepto guardado con éxito.");
 }
 
+// 4. Navegación
 function logout() {
-    location.reload();
+    // Regresa al archivo principal en la raíz
+    window.location.href = "../index.html";
 }
