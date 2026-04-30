@@ -1,24 +1,23 @@
-// Recuperamos datos guardados o iniciamos vacío
 let clientesNocturnos = JSON.parse(localStorage.getItem('clientesNocturnos')) || [];
 
-// 1. Manejo de Roles
 function checkLogin() {
     const pass = document.getElementById('pass-admin').value;
-    if(pass === "admin123") { // Cambia esta clave a tu gusto
+    if(pass === "admin123") {
         document.getElementById('login-section').classList.add('hidden');
         document.getElementById('admin-panel').classList.remove('hidden');
+        actualizarMonitorAdmin();
     } else {
-        alert("Contraseña de administrador incorrecta");
+        alert("Contraseña incorrecta");
     }
 }
 
 function showUserPanel() {
     document.getElementById('login-section').classList.add('hidden');
     document.getElementById('user-panel').classList.remove('hidden');
-    renderizarClientes();
+    renderizarClientesTecnico();
 }
 
-// 2. Funciones de Administrador
+// LÓGICA ADMINISTRADOR
 function agregarCliente() {
     const nombreInput = document.getElementById('nombre-cliente');
     const nombre = nombreInput.value.trim();
@@ -31,19 +30,31 @@ function agregarCliente() {
         });
         localStorage.setItem('clientesNocturnos', JSON.stringify(clientesNocturnos));
         nombreInput.value = "";
-        alert("Cliente añadido: " + nombre);
-    } else {
-        alert("Por favor ingrese un nombre");
+        actualizarMonitorAdmin();
     }
 }
 
-// 3. Funciones de Técnico (Dinámico)
-function renderizarClientes() {
+function actualizarMonitorAdmin() {
+    const lista = document.getElementById('monitor-lista');
+    lista.innerHTML = "";
+    
+    clientesNocturnos.forEach(cliente => {
+        const item = document.createElement('div');
+        item.className = "monitor-item";
+        // Si tiene contenido en concepto pone ✅, si no ❌
+        const icono = cliente.concepto.trim() !== "" ? "✅" : "❌";
+        item.innerHTML = `<span>${cliente.nombre}</span> <span>${icono}</span>`;
+        lista.appendChild(item);
+    });
+}
+
+// LÓGICA TÉCNICO
+function renderizarClientesTecnico() {
     const contenedor = document.getElementById('lista-clientes-soporte');
     contenedor.innerHTML = "";
 
     if(clientesNocturnos.length === 0) {
-        contenedor.innerHTML = "<p style='text-align:center; opacity:0.5;'>No hay clientes asignados para hoy.</p>";
+        contenedor.innerHTML = "<p style='text-align:center; opacity:0.5;'>No hay clientes asignados.</p>";
         return;
     }
 
@@ -51,26 +62,31 @@ function renderizarClientes() {
         const div = document.createElement('div');
         div.className = "soporte-card";
         div.innerHTML = `
-            <h3 style="color: #fff; margin-bottom: 5px;">👤 ${cliente.nombre}</h3>
-            <small style="color: #00c6ff; opacity: 0.7;">Asignado el: ${cliente.fecha}</small>
-            <textarea id="concepto-${index}" placeholder="Redacte aquí el soporte realizado...">${cliente.concepto}</textarea>
-            <button onclick="guardarSoporte(${index})" class="btn-guardar" style="margin-top:10px; padding: 8px 20px; font-size: 0.9em;">
-                💾 Guardar para ${cliente.nombre}
-            </button>
+            <h3>👤 ${cliente.nombre}</h3>
+            <textarea id="concepto-${index}" placeholder="Redacte el soporte...">${cliente.concepto}</textarea>
         `;
         contenedor.appendChild(div);
     });
 }
 
-function guardarSoporte(index) {
-    const texto = document.getElementById(`concepto-${index}`).value;
-    clientesNocturnos[index].concepto = texto;
+function guardarTodoElSoporte() {
+    let completo = true;
+
+    clientesNocturnos.forEach((cliente, index) => {
+        const texto = document.getElementById(`concepto-${index}`).value;
+        clientesNocturnos[index].concepto = texto;
+        if(texto.trim() === "") completo = false;
+    });
+
     localStorage.setItem('clientesNocturnos', JSON.stringify(clientesNocturnos));
-    alert("Concepto guardado con éxito.");
+    
+    if(!completo) {
+        alert("Atención: Algunos reportes están vacíos (se marcarán con ❌ para el admin).");
+    } else {
+        alert("✅ Todos los reportes guardados correctamente.");
+    }
 }
 
-// 4. Navegación
 function logout() {
-    // Regresa al archivo principal en la raíz
     window.location.href = "../index.html";
 }
