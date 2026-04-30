@@ -27,8 +27,9 @@
             margin: 8px 0; border-radius: 8px;
             display: flex; justify-content: space-between; align-items: center;
         }
-        .historial-item { border-left: 5px solid #7000ff !important; margin-top: 20px; }
-        .btn-delete { background: none; border: none; color: #ff4d4d; cursor: pointer; font-size: 1.2em; }
+        /* Estilo Historial Imagen 1 */
+        .historial-item { border-left: 5px solid #00c6ff !important; background: #0a192f !important; }
+        .btn-delete { background: none; border: none; color: #ff4d4d; cursor: pointer; font-size: 1.1em; display: flex; align-items: center; gap: 5px; }
     </style>
 </head>
 <body>
@@ -61,22 +62,25 @@
                 <h3 style="color: #00c6ff; margin-bottom: 15px;">📊 Estado de Atenciones</h3>
                 <div id="monitor-lista"></div>
             </div>
-            <button onclick="logout()" class="btn-back" style="margin-top: 20px;">Cerrar Sesión</button>
+
+            <div class="action-buttons" style="margin-top: 20px; display: flex; gap: 10px;">
+                <button onclick="window.location.reload()" class="btn-back" style="flex: 1;">Volver</button>
+                <button onclick="logout()" class="btn-back" style="flex: 1; background: #ff4d4d22;">Cerrar Sesión</button>
+            </div>
         </div>
 
         <!-- PANEL TÉCNICO -->
         <div id="user-panel" class="user-panel hidden">
             <h2 style="color: #00c6ff;">📝 Registro de Actividades</h2>
-            
             <div class="form-container" style="margin-bottom: 20px;">
-                <input type="text" id="nombre-tecnico" placeholder="Nombre del Técnico de Turno" style="border-color: #7000ff;">
+                <input type="text" id="nombre-tecnico" placeholder="Nombre del Técnico de Turno" style="border-color: #00c6ff;">
             </div>
 
             <div id="lista-clientes-soporte"></div>
             
             <div class="action-buttons" style="margin: 25px 0; display: flex; gap: 10px;">
                 <button onclick="guardarTodoElSoporte()" class="btn-guardar" style="flex: 2;">💾 Guardar Registro Final</button>
-                <button onclick="logout()" class="btn-back" style="flex: 1;">Volver</button>
+                <button onclick="window.location.reload()" class="btn-back" style="flex: 1;">Volver</button>
             </div>
 
             <div style="margin-top: 40px;">
