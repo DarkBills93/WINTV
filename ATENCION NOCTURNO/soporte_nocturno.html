@@ -2,49 +2,74 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Soporte Nocturno - WNTV</title>
-    <link rel="stylesheet" href="css/style.css">
+    <!-- Ruta corregida para salir de la carpeta y entrar a css -->
+    <link rel="stylesheet" href="../css/style.css">
     <style>
         .hidden { display: none; }
-        .soporte-card { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; margin-bottom: 15px; border-left: 5px solid #7000ff; }
-        .admin-panel, .user-panel { max-width: 800px; margin: 20px auto; padding: 20px; }
+        .soporte-card { 
+            background: rgba(255, 255, 255, 0.05); 
+            padding: 20px; 
+            border-radius: 15px; 
+            margin-bottom: 15px; 
+            border-left: 5px solid #00c6ff;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        .admin-panel, .user-panel { max-width: 800px; margin: 20px auto; }
+        textarea {
+            width: 100%;
+            height: 100px;
+            margin-top: 10px;
+            background: rgba(0, 0, 0, 0.4);
+            color: #fff;
+            border: 1px solid #00c6ff;
+            border-radius: 8px;
+            padding: 10px;
+            font-family: inherit;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <img src="img/logo.png" alt="Logo" class="logo-principal">
-            <h1>Soporte Nocturno</h1>
+            <!-- Ruta corregida para el logo -->
+            <img src="../img/logo.png" alt="Logo WNTV" class="logo-principal" style="width: 270px;">
+            <h1 class="neon-text">Soporte Nocturno</h1>
         </div>
 
-        <!-- LOGIN SIMPLE -->
+        <!-- SECCIÓN DE ACCESO -->
         <div id="login-section" class="form-container">
-            <input type="password" id="pass-admin" placeholder="Contraseña Admin">
-            <button onclick="checkLogin()" class="btn-guardar">Entrar como Admin</button>
-            <hr style="margin: 20px 0; opacity: 0.2;">
-            <button onclick="showUserPanel()" class="btn-back" style="width: 100%;">Entrar como Técnico</button>
+            <h3 style="color: #00c6ff; text-align: center;">Seleccione su Rol</h3>
+            <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 20px;">
+                <input type="password" id="pass-admin" placeholder="Contraseña Administrador">
+                <button onclick="checkLogin()" class="btn-guardar" style="background: linear-gradient(135deg, #00c6ff, #0072ff);">Entrar como Admin</button>
+                <hr style="opacity: 0.2;">
+                <button onclick="showUserPanel()" class="btn-back" style="width: 100%;">Entrar como Técnico</button>
+            </div>
         </div>
 
-        <!-- PANEL ADMINISTRADOR (Agrega Clientes) -->
+        <!-- PANEL ADMINISTRADOR -->
         <div id="admin-panel" class="admin-panel hidden">
-            <h2>⚙️ Panel Administrador</h2>
+            <h2 style="color: #00c6ff;">⚙️ Panel Administrador</h2>
             <div class="form-container">
-                <input type="text" id="nombre-cliente" placeholder="Nombre del Cliente/Usuario">
-                <button onclick="agregarCliente()" class="btn-guardar" style="margin-top: 10px;">Añadir a la lista</button>
+                <input type="text" id="nombre-cliente" placeholder="Nombre del Cliente o Usuario">
+                <button onclick="agregarCliente()" class="btn-guardar" style="margin-top: 15px; width: 100%;">Añadir a la Lista de Hoy</button>
             </div>
-            <button onclick="logout()" class="btn-back">Cerrar Sesión</button>
+            <button onclick="logout()" class="btn-back" style="margin-top: 20px;">Cerrar Sesión</button>
         </div>
 
-        <!-- PANEL USUARIO (Redacta Soporte) -->
+        <!-- PANEL TÉCNICO -->
         <div id="user-panel" class="user-panel hidden">
-            <h2>📝 Registro de Actividades</h2>
+            <h2 style="color: #00c6ff;">📝 Registro de Actividades</h2>
             <div id="lista-clientes-soporte">
-                <!-- Aquí saldrán los clientes con su textbox -->
+                <!-- Se llena dinámicamente -->
             </div>
-            <button onclick="logout()" class="btn-back">Volver al Inicio</button>
+            <button onclick="logout()" class="btn-back" style="margin-top: 20px;">Volver al Menú</button>
         </div>
     </div>
 
-    <script src="js/soporte.js"></script>
+    <!-- El script está en la misma carpeta -->
+    <script src="soporte.js"></script>
 </body>
 </html>
