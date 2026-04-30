@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Soporte Nocturno - WNTV</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .hidden { display: none; }
+        .soporte-card { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; margin-bottom: 15px; border-left: 5px solid #7000ff; }
+        .admin-panel, .user-panel { max-width: 800px; margin: 20px auto; padding: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="img/logo.png" alt="Logo" class="logo-principal">
+            <h1>Soporte Nocturno</h1>
+        </div>
+
+        <!-- LOGIN SIMPLE -->
+        <div id="login-section" class="form-container">
+            <input type="password" id="pass-admin" placeholder="Contraseña Admin">
+            <button onclick="checkLogin()" class="btn-guardar">Entrar como Admin</button>
+            <hr style="margin: 20px 0; opacity: 0.2;">
+            <button onclick="showUserPanel()" class="btn-back" style="width: 100%;">Entrar como Técnico</button>
+        </div>
+
+        <!-- PANEL ADMINISTRADOR (Agrega Clientes) -->
+        <div id="admin-panel" class="admin-panel hidden">
+            <h2>⚙️ Panel Administrador</h2>
+            <div class="form-container">
+                <input type="text" id="nombre-cliente" placeholder="Nombre del Cliente/Usuario">
+                <button onclick="agregarCliente()" class="btn-guardar" style="margin-top: 10px;">Añadir a la lista</button>
+            </div>
+            <button onclick="logout()" class="btn-back">Cerrar Sesión</button>
+        </div>
+
+        <!-- PANEL USUARIO (Redacta Soporte) -->
+        <div id="user-panel" class="user-panel hidden">
+            <h2>📝 Registro de Actividades</h2>
+            <div id="lista-clientes-soporte">
+                <!-- Aquí saldrán los clientes con su textbox -->
+            </div>
+            <button onclick="logout()" class="btn-back">Volver al Inicio</button>
+        </div>
+    </div>
+
+    <script src="js/soporte.js"></script>
+</body>
+</html>
