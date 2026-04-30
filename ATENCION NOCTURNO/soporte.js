@@ -26,7 +26,7 @@ setInterval(() => {
 
 // 1. CONTROL DE ACCESO
 function checkLogin() {
-    if(document.getElementById('pass-admin').value === "admin123") {
+    if(document.getElementById('pass-admin').value === "ANDREA2026") {
         document.getElementById('login-section').classList.add('hidden');
         document.getElementById('admin-panel').classList.remove('hidden');
         panelAbierto = "admin";
@@ -130,7 +130,7 @@ function renderizarClientesTecnico() {
             div.className = "soporte-card";
             div.innerHTML = `
                 <h3>👤 ${c.nombre} <small style="font-size:0.6em; opacity:0.6;">(${c.fechaIngreso})</small></h3>
-                <textarea id="texto-${i}" placeholder="Escriba el fundamento del soporte..."></textarea>
+                <textarea id="texto-${i}" placeholder="Escriba la solucion brindada..."></textarea>
             `;
             contenedor.appendChild(div);
         }
