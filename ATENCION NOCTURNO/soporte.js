@@ -1,10 +1,12 @@
-const API_URL = "https://sheetdb.io/api/v1/rqnh53f674hz4";
+// Rutas específicas para cada pestaña de tu Google Sheet
+const API_ADMIN = "https://sheetdb.io/api/v1/rqnh53f674hz4?sheet=ADMINISTRADOR";
+const API_SOPORTE = "https://sheetdb.io/api/v1/rqnh53f674hz4?sheet=SOPORTE";
 
 let clientesNocturnos = [];
 let historialNocturno = [];
 let panelAbierto = "";
 
-// 1. SISTEMA DE SINCRONIZACIÓN CON LA NUBE (CADA 5 SEGUNDOS)
+// 1. SINCRONIZACIÓN AUTOMÁTICA
 setInterval(() => {
     if (panelAbierto !== "") {
         sincronizarConNube();
@@ -13,12 +15,16 @@ setInterval(() => {
 
 async function sincronizarConNube() {
     try {
-        const response = await fetch(API_URL);
+        // Consultamos la hoja ADMINISTRADOR para ver quién está pendiente
+        const response = await fetch(API_ADMIN);
         const datos = await response.json();
 
-        // Clasificamos los datos según la columna 'estado' de tu Google Sheet
+        // Filtramos por la columna 'estado' de la primera imagen
         clientesNocturnos = datos.filter(d => d.estado === "pendiente");
-        historialNocturno = datos.filter(d => d.estado === "atendido");
+
+        // Consultamos la hoja SOPORTE para el historial (segunda imagen)
+        const responseHistorial = await fetch(API_SOPORTE);
+        historialNocturno = await responseHistorial.json();
 
         if (panelAbierto === "admin") {
             actualizarMonitorAdmin();
@@ -38,7 +44,7 @@ async function sincronizarConNube() {
             });
         }
     } catch (error) {
-        console.error("Error sincronizando con Soporte JC Cloud:", error);
+        console.error("Error de sincronización:", error);
     }
 }
 
@@ -59,10 +65,10 @@ function showUserPanel() {
     sincronizarConNube();
 }
 
-// 3. LÓGICA ADMINISTRADOR (ESCRITURA EN GOOGLE SHEETS)
+// 3. LÓGICA ADMINISTRADOR (Llena la hoja ADMINISTRADOR)
 async function agregarCliente() {
     const input = document.getElementById('nombre-cliente');
-    const nombre = input.value.trim();
+    const nombre = input.value.trim().toUpperCase();
     
     if(nombre) {
         const nuevoRegistro = {
@@ -74,7 +80,7 @@ async function agregarCliente() {
         };
 
         try {
-            await fetch(API_URL, {
+            await fetch(API_ADMIN, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ data: [nuevoRegistro] })
@@ -82,7 +88,7 @@ async function agregarCliente() {
             input.value = "";
             sincronizarConNube();
         } catch (error) {
-            alert("Error al conectar con la base de datos.");
+            alert("Error al registrar cliente.");
         }
     }
 }
@@ -91,7 +97,7 @@ function actualizarMonitorAdmin() {
     const lista = document.getElementById('monitor-lista');
     if (!lista) return;
     lista.innerHTML = "";
-    clientesNocturnos.forEach((c, i) => {
+    clientesNocturnos.forEach((c) => {
         const item = document.createElement('div');
         item.className = "monitor-item";
         item.innerHTML = `
@@ -104,7 +110,7 @@ function actualizarMonitorAdmin() {
     });
 }
 
-// 4. LÓGICA TÉCNICO (ACTUALIZACIÓN DE FILA)
+// 4. LÓGICA TÉCNICO (COMPLETA AMBAS HOJAS)
 function renderizarClientesTecnico() {
     const contenedor = document.getElementById('lista-clientes-soporte');
     if (!contenedor) return;
@@ -127,40 +133,57 @@ function renderizarClientesTecnico() {
 }
 
 async function guardarTodoElSoporte() {
-    const tecnico = document.getElementById('nombre-tecnico').value.trim();
-    if(!tecnico) { alert("Por favor, ingrese su nombre de técnico."); return; }
+    const tecnicoNombre = document.getElementById('nombre-tecnico').value.trim();
+    if(!tecnicoNombre) { alert("Por favor, ingrese su nombre de técnico."); return; }
 
     let huboCambio = false;
     for (let i = 0; i < clientesNocturnos.length; i++) {
         const textoArea = document.getElementById(`texto-${i}`);
         if(textoArea && textoArea.value.trim() !== "") {
+            const clienteNombre = clientesNocturnos[i].usuario;
+            const solucion = textoArea.value.trim();
+
             try {
-                await fetch(`${API_URL}/usuario/${clientesNocturnos[i].usuario}`, {
+                // A. Actualizamos la pestaña ADMINISTRADOR (Estado y Reporte)
+                await fetch(`${API_ADMIN}/usuario/${clienteNombre}`, {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         data: {
-                            tecnico: tecnico,
-                            reporte: textoArea.value.trim(),
-                            estado: "atendido",
-                            fecha: new Date().toLocaleString()
+                            tecnico: tecnicoNombre,
+                            reporte: solucion,
+                            estado: "atendido"
                         }
                     })
                 });
+
+                // B. Registramos en la pestaña SOPORTE (Columnas: fecha, soporte, cliente, solucion)
+                await fetch(API_SOPORTE, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        data: [{
+                            fecha: new Date().toLocaleString(),
+                            soporte: tecnicoNombre,
+                            cliente: clienteNombre,
+                            solucion: solucion
+                        }]
+                    })
+                });
                 huboCambio = true;
-            } catch (error) { console.error("Error al guardar fila:", error); }
+            } catch (error) { console.error("Error al guardar:", error); }
         }
     }
 
     if(huboCambio) {
-        alert("✅ Sincronizado en todos los dispositivos de Soporte JC.");
+        alert("✅ Sincronizado en ambas hojas y plataforma.");
         sincronizarConNube();
     } else {
         alert("No hay información nueva para guardar.");
     }
 }
 
-// 5. HISTORIAL Y PDF
+// 5. HISTORIAL (Desde la pestaña SOPORTE)
 function mostrarHistorial() {
     const contenedor = document.getElementById('log-historial-nocturno');
     if (!contenedor) return;
@@ -175,20 +198,19 @@ function mostrarHistorial() {
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <div>
                     <small style="color:#aaa;">📅 ${log.fecha}</small><br>
-                    <b>Técnico:</b> <span style="color:#00c6ff;">${log.tecnico}</span> | 
-                    <b>Cliente:</b> <span style="color:#00c6ff;">${log.usuario}</span><br>
-                    <p style="margin-top:10px; font-style:italic; color:#eee;">"${log.reporte}"</p>
+                    <b>Soporte:</b> <span style="color:#00c6ff;">${log.soporte}</span> | 
+                    <b>Cliente:</b> <span style="color:#00c6ff;">${log.cliente}</span><br>
+                    <p style="margin-top:10px; font-style:italic; color:#eee;">"${log.solucion}"</p>
                 </div>
-                <button onclick="eliminarFila('${log.usuario}')" style="background:none; border:none; cursor:pointer; font-size:1.3em; color:#ff4d4d;">🗑️</button>
             </div>`;
         contenedor.appendChild(div);
     });
 }
 
 async function eliminarFila(usuario) {
-    if(confirm(`¿Deseas eliminar permanentemente a ${usuario} de la nube?`)) {
+    if(confirm(`¿Deseas eliminar a ${usuario} de la lista de espera?`)) {
         try {
-            await fetch(`${API_URL}/usuario/${usuario}`, { method: 'DELETE' });
+            await fetch(`${API_ADMIN}/usuario/${usuario}`, { method: 'DELETE' });
             sincronizarConNube();
         } catch (error) { alert("Error al eliminar."); }
     }
@@ -197,16 +219,12 @@ async function eliminarFila(usuario) {
 function exportarPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-    doc.setFontSize(18);
-    doc.setTextColor(0, 198, 255);
-    doc.text("INFORME DE SOPORTE NOCTURNO - WNTV", 105, 20, { align: 'center' });
-    
-    const filas = historialNocturno.map(h => [h.fecha, h.tecnico, h.usuario, h.reporte]);
+    doc.text("INFORME DE SOPORTE NOCTURNO", 105, 20, { align: 'center' });
+    const filas = historialNocturno.map(h => [h.fecha, h.soporte, h.cliente, h.solucion]);
     doc.autoTable({
-        startY: 35,
-        head: [['Fecha/Hora', 'Técnico', 'Cliente', 'Fundamento del Soporte']],
-        body: filas,
-        theme: 'striped'
+        startY: 30,
+        head: [['Fecha', 'Soporte', 'Cliente', 'Solución']],
+        body: filas
     });
     doc.save(`Reporte_JC_${new Date().toLocaleDateString()}.pdf`);
 }
