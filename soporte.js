@@ -25,7 +25,7 @@ function iniciarSincronizacion() {
         const historial = snapshot.docs.map(doc => doc.data());
         const contenedor = document.getElementById('log-historial-nocturno');
         if (contenedor) {
-            contenedor.innerHTML = `<h4 style="color: #555;">Historial Reciente:</h4>` + historial.slice(0,10).map(h => `
+            contenedor.innerHTML = `<h4 style="color: #00c6ff;">Historial Reciente:</h4>` + historial.slice(0,10).map(h => `
                 <div style="border-bottom: 1px solid #1a2a3a; padding: 10px; font-size: 0.9em; text-align:left;">
                     <b style="color:#00c6ff;">${h.Cliente}</b> <span style="color:#2ecc71;">(${h.Soporte})</span>: ${h.Solucion}
                 </div>`).join('');
@@ -69,7 +69,7 @@ window.guardarTodoElSoporte = async function() {
             await updateDoc(doc(db, "Administrador", c.id), { Estado: "ATENDIDO", SNV2: tecnico, Solucion: texto });
         }
     }
-    alert("Datos sincronizados");
+    alert("Datos sincronizados con éxito");
 };
 
 function renderizarClientesTecnico() {
@@ -77,7 +77,7 @@ function renderizarClientesTecnico() {
     document.getElementById('lista-clientes-soporte').innerHTML = lista.map((c) => `
         <div class="soporte-card">
             <b>USUARIO: ${c.Cliente}</b>
-            <textarea id="texto-${c.id}" placeholder="Solución brindada..."></textarea>
+            <textarea id="texto-${c.id}" placeholder="Escribe la solución brindada..."></textarea>
         </div>`).join('');
 }
 
@@ -102,13 +102,13 @@ function actualizarMonitorAdmin(listaFiltrada = null) {
 window.filtrarPorFecha = function(fecha) {
     if (!fecha) return actualizarMonitorAdmin();
     const filtrados = clientesNocturnos.filter(c => {
-        const fDoc = new Date(c.Fecha?.seconds * 1000).toLocaleDateString('en-CA');
+        if(!c.Fecha) return false;
+        const fDoc = new Date(c.Fecha.seconds * 1000).toLocaleDateString('en-CA');
         return fDoc === fecha;
     });
     actualizarMonitorAdmin(filtrados);
 };
 
-// MODELO DE PDF ESTILO FACTURA (NO CAMBIADO)
 window.exportarPDF = function(todo = false) {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF('p', 'mm', 'a4');
@@ -116,9 +116,11 @@ window.exportarPDF = function(todo = false) {
     let datos = clientesNocturnos;
 
     if (!todo && fechaFiltro) {
-        datos = clientesNocturnos.filter(c => 
-            new Date(c.Fecha?.seconds * 1000).toLocaleDateString('en-CA') === fechaFiltro
-        );
+        datos = clientesNocturnos.filter(c => {
+            if(!c.Fecha) return false;
+            const fDoc = new Date(c.Fecha.seconds * 1000).toLocaleDateString('en-CA');
+            return fDoc === fechaFiltro;
+        });
     }
 
     doc.setFontSize(22);
@@ -132,8 +134,8 @@ window.exportarPDF = function(todo = false) {
     
     doc.setFontSize(11);
     doc.setTextColor(0);
-    doc.text(`FECHA: ${fechaFiltro || new Date().toLocaleDateString()}`, 14, 45);
-    doc.text(`RESPONSABLE: JC (ADMIN)`, 14, 52);
+    doc.text(`FECHA REPORTE: ${fechaFiltro || new Date().toLocaleDateString()}`, 14, 45);
+    doc.text(`GENERADO POR: JC (ADMIN)`, 14, 52);
 
     const filas = datos.map(c => [
         c.Cliente, 
@@ -143,8 +145,8 @@ window.exportarPDF = function(todo = false) {
     ]);
 
     doc.autoTable({
-        startY: 65,
-        head: [['CLIENTE', 'ATENDIDO POR', 'FECHA', 'TRABAJO REALIZADO']],
+        startY: 60,
+        head: [['CLIENTE', 'TÉCNICO', 'FECHA', 'TRABAJO REALIZADO']],
         body: filas,
         theme: 'grid',
         headStyles: { fillColor: [44, 62, 80], halign: 'center' },
@@ -155,5 +157,5 @@ window.exportarPDF = function(todo = false) {
         }
     });
 
-    doc.save(todo ? "Reporte_General.pdf" : `Reporte_${fechaFiltro || 'Soporte'}.pdf`);
+    doc.save(todo ? "Reporte_Historico_WNTV.pdf" : `Reporte_Soporte_${fechaFiltro || 'Diario'}.pdf`);
 };
