@@ -76,14 +76,16 @@
             color: #fff; outline: none; text-align: center;
         }
 
-        /* --- ESTILO CALENDARIO JC --- */
+        /* --- ESTILO CALENDARIO JC ACTUALIZADO --- */
         #filtro-calendario {
-            border: 2px solid var(--naranja-fuego);
-            background: rgba(255, 123, 0, 0.1);
-            color: var(--amarillo-neon);
+            background: transparent !important; /* Sin fondo */
+            border: 2px solid var(--naranja-fuego) !important; /* Borde Naranja */
+            border-radius: 50px !important; /* Forma Circular/Píldora */
+            color: #ffffff !important; /* Texto Blanco (Ya no amarillo) */
             font-weight: bold;
             cursor: pointer;
             box-shadow: 0 0 10px rgba(255, 123, 0, 0.3);
+            max-width: 200px;
         }
 
         .btn-main { 
@@ -114,7 +116,9 @@
         /* Estilos Flatpickr Personalizados */
         .flatpickr-calendar { background: #0d0d0d !important; border: 1px solid var(--naranja-fuego) !important; box-shadow: 0 0 15px var(--naranja-fuego) !important; }
         .flatpickr-day.selected { background: var(--naranja-fuego) !important; border-color: var(--naranja-fuego) !important; color: #000 !important; font-weight: bold !important; }
-        .flatpickr-current-month, .flatpickr-weekday { color: var(--amarillo-neon) !important; }
+        
+        /* Cambiado Amarillo por Azul en el desplegable */
+        .flatpickr-current-month, .flatpickr-weekday { color: var(--azul-wntv) !important; }
     </style>
 </head>
 <body>
