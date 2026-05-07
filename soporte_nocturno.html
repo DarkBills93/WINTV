@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Soporte Nocturno - WNTV</title>
-    <link rel="stylesheet" href="../css/style.css">
-    <!-- Librerías para PDF -->
+    <link rel="stylesheet" href="css/style.css">
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     
@@ -16,8 +16,6 @@
             margin-bottom: 15px; border-left: 5px solid #00c6ff;
         }
         .admin-panel, .user-panel { max-width: 800px; margin: 20px auto; }
-        
-        /* DISEÑO ACCESO */
         .login-title { color: #00c6ff; text-align: center; font-weight: bold; margin-bottom: 15px; }
         .input-login {
             width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #fff;
@@ -31,8 +29,6 @@
             width: 100%; padding: 12px; border-radius: 10px; border: none;
             background: #5b6fb3; color: white; font-weight: bold; cursor: pointer; margin-top: 15px;
         }
-
-        /* DISEÑO PANEL ADMIN (Imagen enviada) */
         .box-admin {
             border: 1px solid #00c6ff77; border-radius: 15px; padding: 20px;
             background: rgba(10, 37, 64, 0.5); margin-bottom: 20px;
@@ -45,7 +41,6 @@
             width: 100%; padding: 15px; background: #00c6ff; color: white;
             font-weight: bold; border-radius: 10px; border: none; cursor: pointer;
         }
-        
         textarea {
             width: 100%; height: 100px; background: rgba(0, 0, 0, 0.4); color: #fff;
             border: 1px solid #00c6ff; border-radius: 8px; padding: 10px; resize: none;
@@ -59,11 +54,10 @@
 <body>
     <div class="container">
         <div class="header" style="text-align: center; margin-bottom: 30px;">
-            <img src="../img/logo.png" alt="Logo WNTV" style="width: 200px; border-radius: 50%; box-shadow: 0 0 20px #00c6ff;">
+            <img src="img/logo.png" alt="Logo WNTV" style="width: 200px; border-radius: 50%; box-shadow: 0 0 20px #00c6ff;">
             <h1 class="neon-text" style="margin-top: 20px; letter-spacing: 2px;">SOPORTE NOCTURNO</h1>
         </div>
 
-        <!-- ACCESO -->
         <div id="login-section" class="form-container" style="max-width: 450px; margin: auto;">
             <div class="login-title">Acceso al Sistema</div>
             <input type="password" id="pass-admin" class="input-login" placeholder="Contraseña Administrador">
@@ -71,7 +65,6 @@
             <button onclick="showUserPanel()" class="btn-tech-login">SOPORTE NOCTURNO</button>
         </div>
 
-        <!-- PANEL ADMINISTRADOR -->
         <div id="admin-panel" class="admin-panel hidden">
             <div class="box-admin">
                 <h3 style="color: #00c6ff; margin-bottom: 15px;">⚙️ Registro de Usuarios</h3>
@@ -86,30 +79,25 @@
                 </div>
                 <div id="monitor-lista"></div>
             </div>
-
             <button onclick="window.location.reload()" class="btn-tech-login" style="background: #5b6fb3;">Volver</button>
         </div>
 
-        <!-- PANEL TÉCNICO -->
         <div id="user-panel" class="user-panel hidden">
             <h2 style="color: #00c6ff;">📝 Registro de Actividades</h2>
             <div class="form-container" style="margin-bottom: 20px;">
                 <input type="text" id="nombre-tecnico" placeholder="Nombre del Técnico de Turno" style="border-color: #00c6ff; padding: 10px; width: 100%; border-radius: 8px; background: transparent; color: white;">
             </div>
-
             <div id="lista-clientes-soporte"></div>
-            
             <div style="display: flex; gap: 10px; margin-top: 20px;">
                 <button onclick="guardarTodoElSoporte()" class="btn-guardar" style="flex: 2;">💾 Guardar Registro Final</button>
                 <button onclick="window.location.reload()" class="btn-tech-login" style="flex: 1; margin: 0;">Volver</button>
             </div>
-
             <div style="margin-top: 40px;">
                 <h3 style="color: #00c6ff; text-align: center;">📋 Historial de Atenciones</h3>
                 <div id="log-historial-nocturno"></div>
             </div>
         </div>
     </div>
-    <script src="soporte.js"></script>
+    <script type="module" src="js/soporte.js"></script>
 </body>
 </html>
