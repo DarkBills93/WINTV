@@ -13,7 +13,6 @@ import {
     orderBy
 } from "firebase/firestore";
 
-// 1. Tu Configuración de Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyBg15QlVDXJMjBT7_1B-e-S3NYfvjHJ7FI",
   authDomain: "soporte-nocturno.firebaseapp.com",
@@ -30,11 +29,7 @@ let clientesNocturnos = [];
 let historialNocturno = [];
 let panelAbierto = "";
 
-// 2. ESCUCHA EN TIEMPO REAL (Reemplaza a setInterval)
-// Firebase es tan rápido que no necesitas consultar cada 5 segundos,
-// se actualiza solo cuando hay un cambio.
 function iniciarSincronizacionRealTime() {
-    // Escuchar Pendientes en la colección Administrador
     const qPendientes = query(collection(db, "Administrador"), where("Estado", "==", "pendiente"));
     onSnapshot(qPendientes, (snapshot) => {
         clientesNocturnos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -42,7 +37,6 @@ function iniciarSincronizacionRealTime() {
         if (panelAbierto === "tecnico") renderizarClientesTecnico();
     });
 
-    // Escuchar Historial en la colección Soporte
     const qHistorial = query(collection(db, "Soporte"), orderBy("Fecha", "desc"));
     onSnapshot(qHistorial, (snapshot) => {
         historialNocturno = snapshot.docs.map(doc => doc.data());
@@ -50,68 +44,54 @@ function iniciarSincronizacionRealTime() {
     });
 }
 
-// 3. LÓGICA ADMINISTRADOR (Crear Ticket)
 async function agregarCliente() {
     const input = document.getElementById('nombre-cliente');
     const nombre = input.value.trim().toUpperCase();
-    
     if(nombre) {
         try {
             await addDoc(collection(db, "Administrador"), {
                 Cliente: nombre,
                 Estado: "pendiente",
-                Fecha: serverTimestamp(), // Hora oficial de Firebase
+                Fecha: serverTimestamp(),
                 SNV2: "Pendiente"
             });
             input.value = "";
         } catch (error) {
-            console.error("Error al registrar:", error);
-            alert("Error al registrar cliente.");
+            console.error("Error:", error);
         }
     }
 }
 
-// 4. LÓGICA TÉCNICO (Guardar Atención)
 async function guardarTodoElSoporte() {
     const tecnicoNombre = document.getElementById('nombre-tecnico').value.trim();
-    if(!tecnicoNombre) { alert("Por favor, ingrese su nombre de técnico."); return; }
+    if(!tecnicoNombre) { alert("Ingrese su nombre de técnico."); return; }
 
     let huboCambio = false;
-
     for (let i = 0; i < clientesNocturnos.length; i++) {
         const textoArea = document.getElementById(`texto-${i}`);
         const datosCliente = clientesNocturnos[i];
         
         if(textoArea && textoArea.value.trim() !== "") {
-            const solucionText = textoArea.value.trim();
-
             try {
-                // A. Guardar en Colección SOPORTE (Historial)
                 await addDoc(collection(db, "Soporte"), {
                     Cliente: datosCliente.Cliente,
                     Fecha: serverTimestamp(),
-                    Solucion: solucionText,
+                    Solucion: textoArea.value.trim(),
                     Soporte: tecnicoNombre
                 });
 
-                // B. Actualizar Colección ADMINISTRADOR (Marcar como atendido)
                 const docRef = doc(db, "Administrador", datosCliente.id);
                 await updateDoc(docRef, {
                     Estado: "Atendido",
-                    SNV2: "JC" // O el código que desees para identificar la versión
+                    SNV2: "JC" 
                 });
-
                 huboCambio = true;
-            } catch (error) {
-                console.error("Error procesando:", error);
-            }
+            } catch (error) { console.error(error); }
         }
     }
-
-    if(huboCambio) alert("✅ Guardado correctamente en Firebase.");
+    if(huboCambio) alert("✅ Guardado correctamente.");
 }
 
-// 5. CONTROL DE PANELES (Modificados para activar tiempo real)
 function checkLogin() {
     if(document.getElementById('pass-admin').value === "SOPORTENOCTURNO") {
         document.getElementById('login-section').classList.add('hidden');
@@ -128,6 +108,43 @@ function showUserPanel() {
     iniciarSincronizacionRealTime();
 }
 
+// FUNCIONES DE RENDERIZADO (Para que se vea la lista)
+function renderizarClientesTecnico() {
+    const contenedor = document.getElementById('lista-clientes-soporte');
+    contenedor.innerHTML = clientesNocturnos.map((c, i) => `
+        <div class="soporte-card">
+            <h4>Cliente: ${c.Cliente}</h4>
+            <textarea id="texto-${i}" placeholder="Escribe la solución aquí..."></textarea>
+        </div>
+    `).join('');
+}
+
+function mostrarHistorial() {
+    const contenedor = document.getElementById('log-historial-nocturno');
+    contenedor.innerHTML = historialNocturno.map(h => `
+        <div style="border-bottom: 1px solid #444; padding: 10px;">
+            <small>${h.Fecha ? h.Fecha.toDate().toLocaleString() : ''}</small><br>
+            <b>${h.Cliente}</b> - Atendido por: ${h.Soporte}<br>
+            <p>${h.Solucion}</p>
+        </div>
+    `).join('');
+}
+
+function actualizarMonitorAdmin() {
+    const contenedor = document.getElementById('monitor-lista');
+    contenedor.innerHTML = clientesNocturnos.map(c => `
+        <div class="monitor-item">
+            <span>${c.Cliente}</span>
+            <span style="color: #ff9f43;">PENDIENTE</span>
+        </div>
+    `).join('');
+}
+
+// ESTO ES CLAVE: Exportar funciones al objeto window para que el HTML las vea
+window.checkLogin = checkLogin;
+window.showUserPanel = showUserPanel;
+window.agregarCliente = agregarCliente;
+window.guardarTodoElSoporte = guardarTodoElSoporte;
 // Nota: Las funciones renderizarClientesTecnico, mostrarHistorial y actualizarMonitorAdmin 
 // se mantienen casi iguales, solo asegúrate de que usen las mayúsculas: 
 // Ejemplo: c.Cliente en lugar de c.usuario.
