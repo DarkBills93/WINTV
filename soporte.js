@@ -25,10 +25,9 @@ function iniciarSincronizacion() {
         const historial = snapshot.docs.map(doc => doc.data());
         const contenedor = document.getElementById('log-historial-nocturno');
         if (contenedor) {
-            contenedor.innerHTML = historial.map(h => `
-                <div style="border-bottom: 1px solid #333; padding: 10px; background: rgba(255,255,255,0.02); margin-bottom: 5px;">
-                    <b style="color:#00c6ff;">${h.Cliente}</b> - Técnico: <span style="color:#2ecc71;">${h.Soporte}</span><br>
-                    <p style="margin:5px 0 0 0; color: #eee;">${h.Solucion}</p>
+            contenedor.innerHTML = `<h4 style="color: #555;">Últimos Movimientos:</h4>` + historial.slice(0,10).map(h => `
+                <div style="border-bottom: 1px solid #1a2a3a; padding: 10px; font-size: 0.9em;">
+                    <b style="color:#00c6ff;">${h.Cliente}</b> <span style="color:#2ecc71;">(${h.Soporte})</span>: ${h.Solucion}
                 </div>`).join('');
         }
     });
@@ -39,7 +38,7 @@ window.checkLogin = function() {
         document.getElementById('login-section').classList.add('hidden');
         document.getElementById('admin-panel').classList.remove('hidden');
         iniciarSincronizacion();
-    } else { alert("Contraseña incorrecta"); }
+    } else { alert("Clave Incorrecta"); }
 };
 
 window.showUserPanel = function() {
@@ -53,7 +52,7 @@ window.agregarCliente = async function() {
     const nombre = input.value.trim().toUpperCase();
     if(nombre) {
         await addDoc(collection(db, "Administrador"), { 
-            Cliente: nombre, Estado: "pendiente", Fecha: serverTimestamp(), SNV2: "Pendiente", Solucion: "" 
+            Cliente: nombre, Estado: "pendiente", Fecha: serverTimestamp(), SNV2: "PENDIENTE", Solucion: "" 
         });
         input.value = "";
     }
@@ -61,40 +60,40 @@ window.agregarCliente = async function() {
 
 window.guardarTodoElSoporte = async function() {
     const tecnico = document.getElementById('nombre-tecnico').value.trim().toUpperCase();
-    if(!tecnico) return alert("Ingrese su nombre.");
+    if(!tecnico) return alert("Escribe tu nombre");
     const pendientes = clientesNocturnos.filter(c => c.Estado === "pendiente");
     for (let c of pendientes) {
         const texto = document.getElementById(`texto-${c.id}`).value.trim();
         if(texto) {
             await addDoc(collection(db, "Soporte"), { Cliente: c.Cliente, Solucion: texto, Soporte: tecnico, Fecha: serverTimestamp() });
-            await updateDoc(doc(db, "Administrador", c.id), { Estado: "Atendido", SNV2: tecnico, Solucion: texto });
+            await updateDoc(doc(db, "Administrador", c.id), { Estado: "ATENDIDO", SNV2: tecnico, Solucion: texto });
         }
     }
-    alert("Registro completado.");
+    alert("Datos sincronizados");
 };
 
 function renderizarClientesTecnico() {
     const lista = clientesNocturnos.filter(c => c.Estado === "pendiente");
     document.getElementById('lista-clientes-soporte').innerHTML = lista.map((c) => `
         <div class="soporte-card">
-            <h4>Cliente: ${c.Cliente}</h4>
-            <textarea id="texto-${c.id}" placeholder="Escriba la solución..."></textarea>
+            <b>USUARIO: ${c.Cliente}</b>
+            <textarea id="texto-${c.id}" placeholder="¿Qué solución se le brindó?"></textarea>
         </div>`).join('');
 }
 
 function actualizarMonitorAdmin(listaFiltrada = null) {
     const datos = listaFiltrada || clientesNocturnos;
     document.getElementById('monitor-lista').innerHTML = `
-        <table style="width:100%; color:white; border-collapse: collapse;">
-            <tr style="border-bottom: 2px solid #00c6ff;">
-                <th style="padding:10px; text-align:left;">Usuario</th>
-                <th style="padding:10px; text-align:center;">Estado</th>
-                <th style="padding:10px; text-align:center;">Técnico</th>
+        <table style="width:100%; color:white; border-collapse: collapse; font-size: 0.85em;">
+            <tr style="background: #1a2a3a; color: #00c6ff;">
+                <th style="padding:12px;">CLIENTE</th>
+                <th style="padding:12px;">ESTADO</th>
+                <th style="padding:12px;">TÉCNICO</th>
             </tr>
             ${datos.map(c => `
-                <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                <tr style="border-bottom: 1px solid #1a2a3a;">
                     <td style="padding:10px;">${c.Cliente}</td>
-                    <td style="padding:10px; text-align:center;">${c.Estado}</td>
+                    <td style="padding:10px; text-align:center;">${c.Estado === 'ATENDIDO' ? '✅' : '⏳'}</td>
                     <td style="padding:10px; text-align:center;">${c.SNV2}</td>
                 </tr>`).join('')}
         </table>`;
@@ -123,8 +122,10 @@ window.exportarPDF = function(todo = false) {
         c.Solucion || '---'
     ]);
     doc.autoTable({
-        head: [['CLIENTE', 'ESTADO', 'TÉCNICO', 'FECHA', 'SOLUCIÓN']],
-        body: filas
+        head: [['CLIENTE', 'ESTADO', 'TÉCNICO', 'FECHA', 'TRABAJO REALIZADO']],
+        body: filas,
+        theme: 'striped',
+        headStyles: { fillColor: [0, 123, 255] }
     });
     doc.save(todo ? "Reporte_General_JC.pdf" : "Reporte_Diario_JC.pdf");
 };
