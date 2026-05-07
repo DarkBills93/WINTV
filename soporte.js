@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, query, onSnapshot, serverTimestamp, orderBy, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, query, onSnapshot, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyBg15QlVDXJMjBT7_1B-e-S3NYfvjHJ7FI",
@@ -17,17 +17,15 @@ let historialSoporte = [];
 const FECHA_HOY = new Date().toLocaleDateString('en-CA');
 
 function iniciarSincronizacion() {
-    // Sincronizar Clientes (Panel Admin y Técnico)
     onSnapshot(query(collection(db, "Administrador"), orderBy("Fecha", "desc")), (snapshot) => {
         clientesNocturnos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         if (!document.getElementById('admin-panel').classList.contains('hidden')) {
             const fechaFiltro = document.getElementById('filtro-calendario').value;
-            filtrarPorFecha(fechaFiltro); // Mantiene el filtro si existe
+            filtrarPorFecha(fechaFiltro);
         }
         if (!document.getElementById('user-panel').classList.contains('hidden')) renderizarClientesTecnico();
     });
 
-    // Sincronizar Historial Real (Colección Soporte)
     onSnapshot(query(collection(db, "Soporte"), orderBy("Fecha", "desc")), (snapshot) => {
         historialSoporte = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         actualizarHistorialLog();
@@ -57,7 +55,6 @@ function actualizarHistorialLog() {
     }
 }
 
-// LOGIN Y NAVEGACIÓN
 window.checkLogin = function() {
     if(document.getElementById('pass-admin').value === "SOPORTENOCTURNO") {
         document.getElementById('login-section').classList.add('hidden');
@@ -72,7 +69,6 @@ window.showUserPanel = function() {
     iniciarSincronizacion();
 };
 
-// GESTIÓN DE CLIENTES
 window.agregarCliente = async function() {
     const input = document.getElementById('nombre-cliente');
     const nombre = input.value.trim().toUpperCase();
@@ -154,29 +150,27 @@ function actualizarMonitorAdmin(listaFiltrada = null) {
         </table>`;
 }
 
-// FILTRO CALENDARIO DINÁMICO
+// Filtro corregido para que sea dinámico
 window.filtrarPorFecha = function(fecha) {
     if (!fecha) {
         actualizarMonitorAdmin(clientesNocturnos);
         return;
     }
     const filtrados = clientesNocturnos.filter(c => {
-        if(!c.Fecha) return false;
-        const fechaC = new Date(c.Fecha.seconds * 1000).toLocaleDateString('en-CA');
+        if(!c.Fecha || !c.Fecha.seconds) return false;
+        const d = new Date(c.Fecha.seconds * 1000);
+        const fechaC = d.toISOString().split('T')[0];
         return fechaC === fecha;
     });
     actualizarMonitorAdmin(filtrados);
 };
 
-// EXPORTACIÓN PDF PROFESIONAL CON FILTRO DE FECHA
 window.exportarPDF = function(todo = false) {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF('p', 'mm', 'a4');
     const fechaCalendario = document.getElementById('filtro-calendario')?.value;
-    
     let datosParaPDF = [...historialSoporte];
 
-    // Si es "PDF Diario" (todo = false), filtramos por la fecha del calendario o por hoy
     if (!todo) {
         const fechaABuscar = fechaCalendario || FECHA_HOY;
         datosParaPDF = datosParaPDF.filter(h => {
@@ -187,25 +181,20 @@ window.exportarPDF = function(todo = false) {
         if(datosParaPDF.length === 0) return alert("No hay datos para la fecha: " + fechaABuscar);
     }
 
-    // Logo y Título según diseño solicitado
     doc.addImage('img/logo.png', 'PNG', 15, 10, 45, 25); 
     doc.setFont("helvetica", "bold");
     doc.setFontSize(22);
     doc.text("INFORME DE ATENCIONES", 110, 22, { align: "center" });
     doc.text("NOCTURNAS", 110, 32, { align: "center" });
-
     doc.setDrawColor(52, 152, 219);
     doc.setLineWidth(1);
     doc.line(15, 45, 195, 45);
-
     doc.setFontSize(11);
     doc.text(`RESPONSABLE: JC`, 15, 55);
     doc.text(`SEDES: TINGO MARIA – HUANUCO – LIMA`, 15, 62);
-    
     const etiquetaFecha = todo ? "HISTÓRICO GENERAL" : (fechaCalendario || FECHA_HOY);
     doc.text(`FECHA REPORTE: ${etiquetaFecha}`, 15, 69);
 
-    // Mapear datos para la tabla
     const filas = datosParaPDF.map(h => {
         const f = h.Fecha?.seconds ? new Date(h.Fecha.seconds * 1000).toLocaleDateString('es-PE') : '---';
         return [f, h.Cliente, h.Soporte, h.Solucion];
