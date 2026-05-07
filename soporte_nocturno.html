@@ -43,9 +43,7 @@
             border-radius: 50%;
             padding: 18px 32px;
             width: fit-content;
-            filter: drop-shadow(0 0 6px rgba(9, 133, 204, 0.986))
-                    drop-shadow(0 0 18px rgba(6, 104, 231, 0.5))
-                    drop-shadow(0 0 35px rgba(6, 88, 182, 0.712));
+            filter: drop-shadow(0 0 18px rgba(6, 104, 231, 0.5));
         }
         .logo-principal img { width: 140px; }
         .neon-text { 
@@ -57,13 +55,12 @@
             text-transform: uppercase;
         }
 
-        /* AJUSTE PARA ALINEACIÓN VERTICAL CENTRADA */
         #login-section {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 10px; /* Espacio entre elementos */
+            gap: 10px;
             width: 100%;
         }
 
@@ -72,15 +69,42 @@
             border: 1px solid rgba(0, 198, 255, 0.3); background: rgba(0, 0, 0, 0.5); 
             color: #fff; outline: none; text-align: center;
         }
+        
+        /* BOTONES CON NUEVOS COLORES */
         .btn-main { 
             width: 100%; max-width: 350px; padding: 14px; border-radius: 12px; border: none; 
             background: linear-gradient(135deg, #0072ff 0%, #00c6ff 100%); color: white; 
             font-weight: bold; cursor: pointer; transition: all 0.3s ease;
-            box-shadow: 0 0 15px rgba(0, 198, 255, 0.4);
+            box-shadow: 0 4px 15px rgba(0, 198, 255, 0.3);
         }
-        .btn-secondary { 
-            background: linear-gradient(135deg, #434343 0%, #000000 100%); 
-            border: 1px solid #7000ff; 
+        
+        /* Botón Soporte Nocturno - Azul profundo */
+        .btn-soporte {
+            background: linear-gradient(135deg, #3a7bd5 0%, #00d2ff 100%);
+        }
+
+        /* Botón PDF Diario - Azul Grisáceo Profesional */
+        .btn-pdf-diario {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important;
+            color: white; padding: 12px 20px; border: none; border-radius: 8px; 
+            cursor: pointer; font-weight: bold;
+        }
+
+        /* Botón Histórico - Verde Esmeralda */
+        .btn-pdf-historico {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important;
+            color: white; padding: 12px 20px; border: none; border-radius: 8px; 
+            cursor: pointer; font-weight: bold;
+        }
+
+        /* Botón Cerrar Sesión - Rojo Coral */
+        .btn-cerrar {
+            background: linear-gradient(135deg, #cb2d3e 0%, #ef473a 100%) !important;
+        }
+
+        /* Botón Volver - Púrpura Indigo */
+        .btn-volver {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%) !important;
         }
         
         .soporte-card { 
@@ -109,7 +133,7 @@
         <div id="login-section">
             <input type="password" id="pass-admin" class="input-login" placeholder="Contraseña Administrador">
             <button onclick="checkLogin()" class="btn-main">ADMINISTRADOR</button>
-            <button onclick="showUserPanel()" class="btn-main btn-secondary">SOPORTE NOCTURNO</button>
+            <button onclick="showUserPanel()" class="btn-main btn-soporte">SOPORTE NOCTURNO</button>
         </div>
 
         <div id="admin-panel" class="hidden" style="max-width: 850px; margin: auto;">
@@ -120,13 +144,13 @@
             </div>
             
             <div style="margin: 25px 0; display: flex; gap: 10px; justify-content: center; align-items: center; flex-wrap: wrap;">
-                <input type="date" id="filtro-calendario" class="input-login" style="width: auto;" onchange="filtrarPorFecha(this.value)">
-                <button onclick="exportarPDF(false)" style="background:#e67e22; color:white; padding:12px 20px; border:none; border-radius:8px; cursor:pointer; font-weight: bold;">📄 PDF Diario</button>
-                <button onclick="exportarPDF(true)" style="background:#27ae60; color:white; padding:12px 20px; border:none; border-radius:8px; cursor:pointer; font-weight: bold;">📥 Reporte Histórico JC</button>
+                <input type="date" id="filtro-calendario" class="input-login" style="width: auto; cursor: pointer;" onclick="this.showPicker()" onchange="filtrarPorFecha(this.value)">
+                <button onclick="exportarPDF(false)" class="btn-pdf-diario">📄 PDF Diario</button>
+                <button onclick="exportarPDF(true)" class="btn-pdf-historico">📥 Reporte Histórico JC</button>
             </div>
 
             <div id="monitor-lista"></div>
-            <button onclick="window.location.reload()" class="btn-main btn-secondary" style="margin-top:20px; max-width: 200px;">Cerrar Sesión</button>
+            <button onclick="window.location.reload()" class="btn-main btn-cerrar" style="margin-top:20px; max-width: 200px;">Cerrar Sesión</button>
         </div>
 
         <div id="user-panel" class="hidden" style="max-width: 650px; margin: auto;">
@@ -135,11 +159,11 @@
                 <input type="text" id="nombre-tecnico" class="input-login" placeholder="Ej: María, Frank, Luis...">
             </div>
             <div id="lista-clientes-soporte"></div>
-            <button onclick="guardarTodoElSoporte()" class="btn-main" style="margin-top: 20px;">💾 Guardar Actividades y Enviar</button>
+            <button onclick="guardarTodoElSoporte()" class="btn-main">💾 Guardar Actividades y Enviar</button>
             
             <div id="log-historial-nocturno" style="margin-top: 30px;"></div>
 
-            <button onclick="window.location.reload()" class="btn-main btn-secondary" style="margin-top:30px; max-width: 200px;">⬅ Volver</button>
+            <button onclick="window.location.reload()" class="btn-main btn-volver" style="margin-top:30px; max-width: 200px;">⬅ Volver</button>
         </div>
     </div>
 
