@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getFirestore, collection, addDoc, updateDoc, doc, query, where, onSnapshot, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, updateDoc, doc, query, onSnapshot, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// Configuración de Firebase
+// 1. CONFIGURACIÓN DE FIREBASE
 const firebaseConfig = {
   apiKey: "AIzaSyBg15QlVDXJMjBT7_1B-e-S3NYfvjHJ7FI",
   authDomain: "soporte-nocturno.firebaseapp.com",
@@ -16,20 +16,34 @@ const db = getFirestore(app);
 
 let clientesNocturnos = [];
 
-// Sincronización en tiempo real
+// 2. SINCRONIZACIÓN TOTAL (Monitor + Historial)
 function iniciarSincronizacion() {
+    // Escucha la tabla de administración (Pendientes y Atendidos)
     onSnapshot(query(collection(db, "Administrador"), orderBy("Fecha", "desc")), (snapshot) => {
         clientesNocturnos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         const panelAdmin = document.getElementById('admin-panel');
         const panelUser = document.getElementById('user-panel');
         
-        if (!panelAdmin.classList.contains('hidden')) actualizarMonitorAdmin();
-        if (!panelUser.classList.contains('hidden')) renderizarClientesTecnico();
+        if (panelAdmin && !panelAdmin.classList.contains('hidden')) actualizarMonitorAdmin();
+        if (panelUser && !panelUser.classList.contains('hidden')) renderizarClientesTecnico();
+    });
+
+    // Escucha el historial visual de "Soporte Nocturno" (Log de abajo)
+    onSnapshot(query(collection(db, "Soporte"), orderBy("Fecha", "desc")), (snapshot) => {
+        const historial = snapshot.docs.map(doc => doc.data());
+        const contenedor = document.getElementById('log-historial-nocturno');
+        if (contenedor) {
+            contenedor.innerHTML = historial.map(h => `
+                <div style="border-bottom: 1px solid #333; padding: 10px; background: rgba(255,255,255,0.02); margin-bottom: 5px;">
+                    <b style="color:#00c6ff;">${h.Cliente}</b> - Atendido por: <span style="color:#2ecc71;">${h.Soporte}</span><br>
+                    <p style="margin:5px 0 0 0; color: #eee;">${h.Solucion}</p>
+                </div>
+            `).join('');
+        }
     });
 }
 
-// --- FUNCIONES DE INTERFAZ ---
-
+// 3. LOGICA DE ACCESO
 window.checkLogin = function() {
     if(document.getElementById('pass-admin').value === "SOPORTENOCTURNO") {
         document.getElementById('login-section').classList.add('hidden');
@@ -44,6 +58,7 @@ window.showUserPanel = function() {
     iniciarSincronizacion();
 };
 
+// 4. ACCIONES TÉCNICAS
 window.agregarCliente = async function() {
     const input = document.getElementById('nombre-cliente');
     const nombre = input.value.trim().toUpperCase();
@@ -53,7 +68,7 @@ window.agregarCliente = async function() {
             Estado: "pendiente", 
             Fecha: serverTimestamp(), 
             SNV2: "Pendiente",
-            Solucion: "" // Inicializado vacío
+            Solucion: "" 
         });
         input.value = "";
     }
@@ -68,38 +83,44 @@ window.guardarTodoElSoporte = async function() {
     for (let c of pendientes) {
         const texto = document.getElementById(`texto-${c.id}`).value.trim();
         if(texto) {
-            // Guardar en colección Soporte (Historial)
+            // Guardar en el Log de Soporte
             await addDoc(collection(db, "Soporte"), { 
                 Cliente: c.Cliente, 
                 Solucion: texto, 
                 Soporte: tecnico, 
                 Fecha: serverTimestamp() 
             });
-            // Actualizar el documento original para el reporte PDF
+            // Actualizar registro en Administrador (para el reporte de JC)
             await updateDoc(doc(db, "Administrador", c.id), { 
                 Estado: "Atendido", 
                 SNV2: tecnico,
-                Solucion: texto // Ahora el reporte puede leerlo directamente
+                Solucion: texto 
             });
         }
     }
-    alert("Registros guardados con éxito.");
+    alert("Registros actualizados con éxito.");
 };
 
+// 5. RENDERIZADO DE TABLAS
 function renderizarClientesTecnico() {
     const lista = clientesNocturnos.filter(c => c.Estado === "pendiente");
-    document.getElementById('lista-clientes-soporte').innerHTML = lista.map((c) => `
-        <div class="soporte-card">
-            <h4>Cliente: ${c.Cliente}</h4>
-            <textarea id="texto-${c.id}" placeholder="Escriba la solución..."></textarea>
-        </div>
-    `).join('');
+    const cont = document.getElementById('lista-clientes-soporte');
+    if(cont) {
+        cont.innerHTML = lista.map((c) => `
+            <div class="soporte-card">
+                <h4>Cliente: ${c.Cliente}</h4>
+                <textarea id="texto-${c.id}" placeholder="Escriba la solución..."></textarea>
+            </div>
+        `).join('');
+    }
 }
 
-// Renderiza la tabla en el panel Admin (con opción de filtro)
 function actualizarMonitorAdmin(listaFiltrada = null) {
     const datos = listaFiltrada || clientesNocturnos;
-    document.getElementById('monitor-lista').innerHTML = `
+    const cont = document.getElementById('monitor-lista');
+    if(!cont) return;
+
+    cont.innerHTML = `
         <table style="width:100%; color:white; border-collapse: collapse;">
             <tr style="border-bottom: 2px solid #00c6ff;">
                 <th style="padding:10px; text-align:left;">Usuario</th>
@@ -119,51 +140,42 @@ function actualizarMonitorAdmin(listaFiltrada = null) {
     `;
 }
 
-// Filtro del Calendario
-window.filtrarPorFecha = function(fechaSeleccionada) {
-    if (!fechaSeleccionada) {
-        actualizarMonitorAdmin();
-        return;
-    }
+// 6. FILTRO Y EXPORTACIÓN JC
+window.filtrarPorFecha = function(fecha) {
+    if (!fecha) return actualizarMonitorAdmin();
     const filtrados = clientesNocturnos.filter(c => {
-        const fechaDoc = new Date(c.Fecha?.seconds * 1000).toLocaleDateString('en-CA');
-        return fechaDoc === fechaSeleccionada;
+        const fDoc = new Date(c.Fecha?.seconds * 1000).toLocaleDateString('en-CA');
+        return fDoc === fecha;
     });
     actualizarMonitorAdmin(filtrados);
 };
 
-// --- EXPORTACIÓN PDF ESTILO FACTURA JC ---
 window.exportarPDF = function(todo = false) {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-    const fechaFiltro = document.getElementById('filtro-calendario').value;
+    const fechaFiltro = document.getElementById('filtro-calendario')?.value;
     const fechaActual = new Date().toLocaleDateString();
 
     let datos = clientesNocturnos;
-    
-    // Filtrar por fecha si no es "Exportar Todo"
     if (!todo && fechaFiltro) {
         datos = clientesNocturnos.filter(c => {
-            const f = new Date(c.Fecha?.seconds * 1000).toLocaleDateString('en-CA');
-            return f === fechaFiltro;
+            const fDoc = new Date(c.Fecha?.seconds * 1000).toLocaleDateString('en-CA');
+            return fDoc === fechaFiltro;
         });
     }
 
-    // Ordenar por Técnico de Turno
     datos.sort((a, b) => (a.SNV2 || "").localeCompare(b.SNV2 || ""));
 
-    // Diseño de Encabezado Corporativo
+    // ENCABEZADO ESTILO INFORME
     doc.setFillColor(41, 128, 185);
     doc.rect(0, 0, 210, 40, 'F');
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(20);
     doc.text("INFORME TÉCNICO DE SOPORTE", 15, 25);
-    
     doc.setFontSize(10);
     doc.text(`ADMINISTRADOR: JC`, 15, 34);
     doc.text(`FECHA REPORTE: ${fechaActual}`, 160, 34);
 
-    // Preparar filas: [Cliente, Estado, Técnico, Fecha, Solución]
     const filas = datos.map(c => [
         c.Cliente,
         c.Estado.toUpperCase(),
@@ -174,14 +186,16 @@ window.exportarPDF = function(todo = false) {
 
     doc.autoTable({
         startY: 45,
-        head: [['CLIENTE', 'ESTADO', 'TÉCNICO DE TURNO', 'FECHA', 'TRABAJO REALIZADO']],
+        head: [['CLIENTE', 'ESTADO', 'TÉCNICO TURNO', 'FECHA', 'TRABAJO REALIZADO']],
         body: filas,
         theme: 'grid',
         headStyles: { fillColor: [44, 62, 80] },
-        styles: { fontSize: 8, cellPadding: 2 },
-        columnStyles: { 4: { cellWidth: 55 } } // Espacio extra para los comentarios
+        styles: { fontSize: 8 },
+        columnStyles: { 4: { cellWidth: 50 } }
     });
 
+    doc.save(todo ? "Reporte_General_JC.pdf" : `Reporte_JC_${fechaActual}.pdf`);
+};
     const nombreFinal = todo ? `Reporte_General_JC.pdf` : `Reporte_Soporte_JC_${fechaActual}.pdf`;
     doc.save(nombreFinal);
 };
