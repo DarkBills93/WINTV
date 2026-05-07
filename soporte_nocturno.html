@@ -9,7 +9,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     
     <style>
-        /* MANTENGO TODO TU CSS ORIGINAL IGUAL */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', sans-serif;
@@ -33,7 +32,7 @@
             pointer-events: none;
         }
         .container { padding: 20px; text-align: center; position: relative; z-index: 1; }
-        .hidden { display: none !important; } /* Añadido important para asegurar el ocultado */
+        .hidden { display: none !important; }
         
         .logo-principal {
             display: flex;
@@ -47,7 +46,6 @@
             filter: drop-shadow(0 0 6px rgba(9, 133, 204, 0.986))
                     drop-shadow(0 0 18px rgba(6, 104, 231, 0.5))
                     drop-shadow(0 0 35px rgba(6, 88, 182, 0.712));
-            transition: transform 0.3s ease, filter 0.3s ease;
         }
         .logo-principal img { width: 140px; }
         .neon-text { 
@@ -80,7 +78,6 @@
             width: 100%; height: 80px; background: rgba(0,0,0,0.3); color: #fff; 
             border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px; margin-top: 10px;
         }
-        /* Estilo para el botón eliminar */
         .btn-del {
             background: #ff4757; color: white; border: none; padding: 6px 12px; 
             border-radius: 6px; cursor: pointer; font-weight: bold;
@@ -127,6 +124,8 @@
             <button onclick="guardarTodoElSoporte()" class="btn-main" style="margin-top: 20px;">💾 Guardar Actividades y Enviar</button>
             
             <div id="log-historial-nocturno" style="margin-top: 30px;"></div>
+
+            <button onclick="window.location.reload()" class="btn-main btn-secondary" style="margin-top:30px; max-width: 200px;">⬅ Volver</button>
         </div>
     </div>
 
