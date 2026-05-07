@@ -14,37 +14,44 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 let clientesNocturnos = [];
-let historialNocturno = [];
-let panelAbierto = "";
 
-function iniciarSincronizacionRealTime() {
+function iniciarSincronizacion() {
     onSnapshot(query(collection(db, "Administrador"), where("Estado", "==", "pendiente")), (snapshot) => {
         clientesNocturnos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        if (panelAbierto === "admin") actualizarMonitorAdmin();
-        if (panelAbierto === "tecnico") renderizarClientesTecnico();
+        const panelAdmin = document.getElementById('admin-panel');
+        const panelUser = document.getElementById('user-panel');
+        
+        if (!panelAdmin.classList.contains('hidden')) actualizarMonitorAdmin();
+        if (!panelUser.classList.contains('hidden')) renderizarClientesTecnico();
     });
 
     onSnapshot(query(collection(db, "Soporte"), orderBy("Fecha", "desc")), (snapshot) => {
-        historialNocturno = snapshot.docs.map(doc => doc.data());
-        if (panelAbierto === "tecnico") mostrarHistorial();
+        const historial = snapshot.docs.map(doc => doc.data());
+        const contenedor = document.getElementById('log-historial-nocturno');
+        if (contenedor) {
+            contenedor.innerHTML = historial.map(h => `
+                <div style="border-bottom: 1px solid #333; padding: 10px;">
+                    <b>${h.Cliente}</b> - Atendido por: ${h.Soporte}<br>
+                    <p>${h.Solucion}</p>
+                </div>
+            `).join('');
+        }
     });
 }
 
-// Hacemos las funciones globales para que el HTML las encuentre
+// FUNCIONES GLOBALES PARA LOS BOTONES
 window.checkLogin = function() {
     if(document.getElementById('pass-admin').value === "SOPORTENOCTURNO") {
         document.getElementById('login-section').classList.add('hidden');
         document.getElementById('admin-panel').classList.remove('hidden');
-        panelAbierto = "admin";
-        iniciarSincronizacionRealTime();
+        iniciarSincronizacion();
     } else { alert("Contraseña incorrecta"); }
 };
 
 window.showUserPanel = function() {
     document.getElementById('login-section').classList.add('hidden');
     document.getElementById('user-panel').classList.remove('hidden');
-    panelAbierto = "tecnico";
-    iniciarSincronizacionRealTime();
+    iniciarSincronizacion();
 };
 
 window.agregarCliente = async function() {
@@ -58,51 +65,31 @@ window.agregarCliente = async function() {
 
 window.guardarTodoElSoporte = async function() {
     const tecnico = document.getElementById('nombre-tecnico').value.trim();
-    if(!tecnico) return alert("Por favor, ingrese su nombre de técnico.");
+    if(!tecnico) return alert("Ingrese su nombre.");
     
-    let cambios = false;
     for (let i = 0; i < clientesNocturnos.length; i++) {
         const texto = document.getElementById(`texto-${i}`).value.trim();
         if(texto) {
-            await addDoc(collection(db, "Soporte"), { 
-                Cliente: clientesNocturnos[i].Cliente, 
-                Solucion: texto, 
-                Soporte: tecnico, 
-                Fecha: serverTimestamp() 
-            });
-            await updateDoc(doc(db, "Administrador", clientesNocturnos[i].id), { 
-                Estado: "Atendido", 
-                SNV2: "JC" 
-            });
-            cambios = true;
+            await addDoc(collection(db, "Soporte"), { Cliente: clientesNocturnos[i].Cliente, Solucion: texto, Soporte: tecnico, Fecha: serverTimestamp() });
+            await updateDoc(doc(db, "Administrador", clientesNocturnos[i].id), { Estado: "Atendido", SNV2: "JC" });
         }
     }
-    if(cambios) alert("Datos guardados correctamente.");
+    alert("Registro guardado.");
 };
 
 function renderizarClientesTecnico() {
     document.getElementById('lista-clientes-soporte').innerHTML = clientesNocturnos.map((c, i) => `
         <div class="soporte-card">
             <h4>Cliente: ${c.Cliente}</h4>
-            <textarea id="texto-${i}" placeholder="Escriba la solución..."></textarea>
+            <textarea id="texto-${i}" placeholder="Describa la solución..."></textarea>
         </div>
     `).join('');
 }
 
 function actualizarMonitorAdmin() {
     document.getElementById('monitor-lista').innerHTML = clientesNocturnos.map(c => `
-        <div style="background:rgba(255,255,255,0.1); padding:10px; margin:5px; border-radius:5px; display:flex; justify-content:space-between;">
-            <span>${c.Cliente}</span>
-            <span style="color:#00c6ff;">PENDIENTE</span>
-        </div>
-    `).join('');
-}
-
-function mostrarHistorial() {
-    document.getElementById('log-historial-nocturno').innerHTML = historialNocturno.map(h => `
-        <div style="border-bottom:1px solid #444; padding:10px;">
-            <b>${h.Cliente}</b> - ${h.Soporte}<br>
-            <p>${h.Solucion}</p>
+        <div style="background:rgba(255,255,255,0.05); padding:10px; margin-bottom:5px; border-radius:5px;">
+            ${c.Cliente} - <span style="color:#ff9f43;">PENDIENTE</span>
         </div>
     `).join('');
 }
