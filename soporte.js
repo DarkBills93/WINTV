@@ -113,7 +113,7 @@ window.agregarCliente = async function() {
 
 window.eliminarFila = async function(id) {
     if(confirm("¿Deseas eliminar este registro?")) {
-        await deleteDoc(doc(db, "Administrador", id));
+        await deleteDoc(doc(doc(db, "Administrador", id)));
     }
 };
 
@@ -163,31 +163,35 @@ window.filtrarPorFecha = function(fecha) {
     });
 
     contenedor.innerHTML = `
-        <div style="margin-bottom: 10px; text-align: right; color: #00c6ff; font-size: 0.8em; font-weight: bold;">
+        <div style="margin-bottom: 10px; text-align: right; color: #00c6ff; font-size: 0.8em; font-weight: bold; letter-spacing: 1px;">
             REGISTROS ENCONTRADOS: ${datos.length}
         </div>
-        <table style="width:100%; color:white; border-collapse: collapse; font-size: 0.85em; background: rgba(0,0,0,0.2); border-radius: 10px; overflow: hidden;">
-            <tr style="background: rgba(0, 198, 255, 0.1); color: #00c6ff;">
-                <th style="padding:12px; text-align:left;">CLIENTE</th>
-                <th style="padding:12px; text-align:center;">ESTADO</th>
-                <th style="padding:12px; text-align:center;">ACCIÓN</th>
-            </tr>
-            ${datos.length === 0 ? `<tr><td colspan="3" style="padding:20px; color:#666;">No hay datos para esta fecha</td></tr>` : 
-            datos.map(c => `
-                <tr style="border-bottom: 1px solid rgba(0, 198, 255, 0.05);">
-                    <td style="padding:10px;">
-                        <b style="color: #00c6ff;">${c.Cliente}</b><br>
-                        <small style="color:#666;">${c.Fecha?.seconds ? new Date(c.Fecha.seconds * 1000).toLocaleTimeString() : '---'}</small>
+        <table style="width:100%; color:white; border-collapse: separate; border-spacing: 0 10px; font-size: 0.85em;">
+            <thead>
+                <tr style="background: rgba(0, 198, 255, 0.15); color: #00c6ff; text-transform: uppercase;">
+                    <th style="padding:15px; text-align:left; border-radius: 10px 0 0 10px;">CLIENTE</th>
+                    <th style="padding:15px; text-align:center;">ESTADO</th>
+                    <th style="padding:15px; text-align:center; border-radius: 0 10px 10px 0;">ACCIÓN</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${datos.length === 0 ? `<tr><td colspan="3" style="padding:30px; color:#666; text-align:center;">No hay datos para esta fecha</td></tr>` : 
+                datos.map(c => `
+                <tr style="background: rgba(255,255,255,0.05); backdrop-filter: blur(5px);">
+                    <td style="padding:12px; border-radius: 10px 0 0 10px; border-left: 4px solid ${c.Estado === 'ATENDIDO' ? '#96c93d' : '#ffa500'};">
+                        <b style="color: #00c6ff; font-size: 1.1em;">${c.Cliente}</b><br>
+                        <small style="color:#888;">${c.Fecha?.seconds ? new Date(c.Fecha.seconds * 1000).toLocaleTimeString() : '---'}</small>
                     </td>
-                    <td style="padding:10px; text-align:center;">
-                        <span style="color: ${c.Estado === 'ATENDIDO' ? '#96c93d' : '#ffa500'}; font-weight: bold; font-size: 1.1em;">
-                            ${c.Estado === 'ATENDIDO' ? '✅' : '⏳'}
+                    <td style="padding:12px; text-align:center;">
+                        <span style="color: ${c.Estado === 'ATENDIDO' ? '#96c93d' : '#ffa500'}; font-weight: bold; background: rgba(0,0,0,0.3); padding: 5px 12px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);">
+                            ${c.Estado === 'ATENDIDO' ? '✅ FINALIZADO' : '⏳ PENDIENTE'}
                         </span>
                     </td>
-                    <td style="padding:10px; text-align:center;">
-                        <button class="btn-del" onclick="window.eliminarFila('${c.id}')">Eliminar</button>
+                    <td style="padding:12px; text-align:center; border-radius: 0 10px 10px 0;">
+                        <button class="btn-del" onclick="window.eliminarFila('${c.id}')" style="box-shadow: 0 0 10px rgba(255, 71, 87, 0.2);">Eliminar</button>
                     </td>
                 </tr>`).join('')}
+            </tbody>
         </table>`;
 };
 
