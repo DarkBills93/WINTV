@@ -43,9 +43,19 @@
             border-radius: 50%;
             padding: 18px 32px;
             width: fit-content;
-            filter: drop-shadow(0 0 18px rgba(6, 104, 231, 0.5));
+            transition: all 0.4s ease;
+            filter: drop-shadow(0 0 10px rgba(0, 198, 255, 0.8))
+                    drop-shadow(0 0 20px rgba(0, 198, 255, 0.4));
         }
+
+        .logo-principal:hover {
+            filter: drop-shadow(0 0 15px rgba(0, 198, 255, 1))
+                    drop-shadow(0 0 30px rgba(0, 198, 255, 0.6));
+            transform: scale(1.05);
+        }
+
         .logo-principal img { width: 140px; }
+
         .neon-text { 
             color: #ffffff; 
             text-shadow: 0 0 8px #00c6ff, 0 0 15px #00c6ff; 
@@ -60,7 +70,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 15px;
             width: 100%;
         }
 
@@ -70,56 +80,42 @@
             color: #fff; outline: none; text-align: center;
         }
         
-        /* BOTONES CON NUEVOS COLORES */
         .btn-main { 
             width: 100%; max-width: 350px; padding: 14px; border-radius: 12px; border: none; 
-            background: linear-gradient(135deg, #0072ff 0%, #00c6ff 100%); color: white; 
-            font-weight: bold; cursor: pointer; transition: all 0.3s ease;
+            color: white; font-weight: bold; cursor: pointer; transition: all 0.3s ease;
+        }
+
+        .btn-admin {
+            background: linear-gradient(135deg, #0072ff 0%, #00c6ff 100%);
             box-shadow: 0 4px 15px rgba(0, 198, 255, 0.3);
         }
         
-        /* Botón Soporte Nocturno - Azul profundo */
-        .btn-soporte {
-            background: linear-gradient(135deg, #3a7bd5 0%, #00d2ff 100%);
+        /* BOTÓN VERDE ESMERALDA */
+        .btn-soporte-verde {
+            background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%) !important;
+            box-shadow: 0 4px 15px rgba(0, 176, 155, 0.4);
         }
 
-        /* Botón PDF Diario - Azul Grisáceo Profesional */
-        .btn-pdf-diario {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important;
-            color: white; padding: 12px 20px; border: none; border-radius: 8px; 
-            cursor: pointer; font-weight: bold;
-        }
+        .btn-main:hover { transform: translateY(-2px); opacity: 0.9; }
 
-        /* Botón Histórico - Verde Esmeralda */
-        .btn-pdf-historico {
-            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important;
-            color: white; padding: 12px 20px; border: none; border-radius: 8px; 
-            cursor: pointer; font-weight: bold;
-        }
-
-        /* Botón Cerrar Sesión - Rojo Coral */
-        .btn-cerrar {
-            background: linear-gradient(135deg, #cb2d3e 0%, #ef473a 100%) !important;
-        }
-
-        /* Botón Volver - Púrpura Indigo */
-        .btn-volver {
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%) !important;
-        }
+        .btn-pdf-diario { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important; color: white; padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .btn-pdf-historico { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important; color: white; padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .btn-cerrar { background: linear-gradient(135deg, #cb2d3e 0%, #ef473a 100%) !important; }
+        .btn-volver { background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%) !important; }
         
         .soporte-card { 
             background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 15px; 
-            margin-bottom: 15px; border-left: 5px solid #00c6ff; text-align: left;
+            margin-bottom: 15px; border-left: 5px solid #00b09b; text-align: left;
             backdrop-filter: blur(10px);
         }
+        /* Color azul para la etiqueta de usuario */
+        .user-tag { color: #00c6ff; font-weight: bold; }
+
         textarea { 
             width: 100%; height: 80px; background: rgba(0,0,0,0.3); color: #fff; 
             border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px; margin-top: 10px;
         }
-        .btn-del {
-            background: #ff4757; color: white; border: none; padding: 6px 12px; 
-            border-radius: 6px; cursor: pointer; font-weight: bold;
-        }
+        .btn-del { background: #ff4757; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -132,19 +128,19 @@
 
         <div id="login-section">
             <input type="password" id="pass-admin" class="input-login" placeholder="Contraseña Administrador">
-            <button onclick="checkLogin()" class="btn-main">ADMINISTRADOR</button>
-            <button onclick="showUserPanel()" class="btn-main btn-soporte">SOPORTE NOCTURNO</button>
+            <button onclick="checkLogin()" class="btn-main btn-admin">ADMINISTRADOR</button>
+            <button onclick="showUserPanel()" class="btn-main btn-soporte-verde">SOPORTE NOCTURNO</button>
         </div>
 
         <div id="admin-panel" class="hidden" style="max-width: 850px; margin: auto;">
             <h2 style="color: #00c6ff; margin-bottom: 20px;">⚙️ Control Maestro - JC</h2>
             <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px;">
                 <input type="text" id="nombre-cliente" class="input-login" placeholder="Nombre del Usuario">
-                <button onclick="agregarCliente()" class="btn-main" style="width: auto; padding: 12px 30px; margin-top: 10px;">+ Agregar</button>
+                <button onclick="agregarCliente()" class="btn-main btn-admin" style="width: auto; padding: 12px 30px; margin-top: 10px;">+ Agregar</button>
             </div>
             
             <div style="margin: 25px 0; display: flex; gap: 10px; justify-content: center; align-items: center; flex-wrap: wrap;">
-                <input type="date" id="filtro-calendario" class="input-login" style="width: auto; cursor: pointer;" onclick="this.showPicker()" onchange="filtrarPorFecha(this.value)">
+                <input type="date" id="filtro-calendario" class="input-login" style="width: auto; cursor: pointer;" onchange="filtrarPorFecha(this.value)">
                 <button onclick="exportarPDF(false)" class="btn-pdf-diario">📄 PDF Diario</button>
                 <button onclick="exportarPDF(true)" class="btn-pdf-historico">📥 Reporte Histórico JC</button>
             </div>
@@ -155,11 +151,11 @@
 
         <div id="user-panel" class="hidden" style="max-width: 650px; margin: auto;">
             <div style="margin-bottom: 20px;">
-                <label style="color: #00c6ff; display: block; margin-bottom: 10px; font-weight: bold;">TÉCNICO DE TURNO:</label>
+                <label style="color: #96c93d; display: block; margin-bottom: 10px; font-weight: bold;">TÉCNICO DE TURNO:</label>
                 <input type="text" id="nombre-tecnico" class="input-login" placeholder="Ej: María, Frank, Luis...">
             </div>
             <div id="lista-clientes-soporte"></div>
-            <button onclick="guardarTodoElSoporte()" class="btn-main">💾 Guardar Actividades y Enviar</button>
+            <button onclick="guardarTodoElSoporte()" class="btn-main btn-soporte-verde">💾 Guardar Actividades y Enviar</button>
             
             <div id="log-historial-nocturno" style="margin-top: 30px;"></div>
 
