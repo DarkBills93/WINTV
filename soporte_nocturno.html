@@ -8,8 +8,19 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/dark.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+    
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --naranja-fuego: #ff7b00;
+            --amarillo-neon: #ffea00;
+            --azul-wntv: #00c6ff;
+        }
+
         body {
             font-family: 'Segoe UI', sans-serif;
             color: #e6f1f5;
@@ -44,84 +55,69 @@
             padding: 18px 32px;
             width: fit-content;
             transition: all 0.4s ease;
-            filter: drop-shadow(0 0 10px rgba(0, 198, 255, 0.8))
-                    drop-shadow(0 0 20px rgba(0, 198, 255, 0.4));
-        }
-        .logo-principal:hover {
-            filter: drop-shadow(0 0 15px rgba(0, 198, 255, 1))
-                    drop-shadow(0 0 30px rgba(0, 198, 255, 0.6));
-            transform: scale(1.05);
+            filter: drop-shadow(0 0 10px rgba(0, 198, 255, 0.8));
         }
         .logo-principal img { width: 140px; }
 
         .neon-text { 
             color: #ffffff; 
-            text-shadow: 0 0 8px #00c6ff, 0 0 15px #00c6ff; 
+            text-shadow: 0 0 8px var(--azul-wntv), 0 0 15px var(--azul-wntv); 
             font-size: 2.3rem; 
             margin-bottom: 25px; 
             font-weight: bold;
             text-transform: uppercase;
         }
 
-        #login-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-            width: 100%;
-        }
-
-        .input-login { 
-            width: 100%; max-width: 350px; padding: 12px; border-radius: 8px; 
-            border: 1px solid rgba(0, 198, 255, 0.3); background: rgba(0, 0, 0, 0.5); 
-            color: #fff; outline: none; text-align: center;
-        }
-
-        /* --- ESTILO CALENDARIO DINÁMICO --- */
+        /* --- ESTILO CALENDARIO ACTUALIZADO (NARANJA) --- */
         #filtro-calendario {
-            border: 2px solid #00c6ff;
-            background: rgba(0, 198, 255, 0.1);
-            color: #00c6ff;
+            border: 2px solid var(--naranja-fuego) !important;
+            background: rgba(255, 123, 0, 0.1) !important;
+            color: var(--amarillo-neon) !important;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s;
+            box-shadow: 0 0 10px rgba(255, 123, 0, 0.3);
+            text-align: center;
         }
 
-        #filtro-calendario::-webkit-calendar-picker-indicator {
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="15" viewBox="0 0 24 24" fill="none" stroke="%2300c6ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>');
-            cursor: pointer;
-            filter: drop-shadow(0 0 2px #00c6ff);
+        /* PERSONALIZACIÓN DEL POPUP DEL CALENDARIO */
+        .flatpickr-calendar {
+            background: #0a0a0a !important;
+            border: 2px solid var(--naranja-fuego) !important;
+            box-shadow: 0 0 20px rgba(255, 123, 0, 0.5) !important;
+        }
+        .flatpickr-day.selected {
+            background: linear-gradient(135deg, var(--naranja-fuego), var(--amarillo-neon)) !important;
+            border: none !important;
+            color: #000 !important;
+            font-weight: bold;
+        }
+        .flatpickr-current-month, .flatpickr-weekday {
+            color: var(--amarillo-neon) !important;
         }
         
         .btn-main { 
             width: 100%; max-width: 350px; padding: 14px; border-radius: 12px; border: none; 
             color: white; font-weight: bold; cursor: pointer; transition: all 0.3s ease;
         }
+        .btn-admin { background: linear-gradient(135deg, #0072ff 0%, #00c6ff 100%); }
+        .btn-soporte-verde { background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%) !important; }
 
-        .btn-admin {
-            background: linear-gradient(135deg, #0072ff 0%, #00c6ff 100%);
-            box-shadow: 0 4px 15px rgba(0, 198, 255, 0.3);
+        /* Botón PDF Diario con el Color Naranja Bonito */
+        .btn-pdf-diario { 
+            background: linear-gradient(135deg, var(--naranja-fuego), #e65100) !important; 
+            color: white; padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; 
+            box-shadow: 0 0 10px rgba(255, 123, 0, 0.4);
         }
-        
-        .btn-soporte-verde {
-            background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%) !important;
-            box-shadow: 0 4px 15px rgba(0, 176, 155, 0.4);
-        }
-
-        .btn-main:hover { transform: translateY(-2px); opacity: 0.9; }
-
-        .btn-pdf-diario { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important; color: white; padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
         .btn-pdf-historico { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important; color: white; padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
         .btn-cerrar { background: linear-gradient(135deg, #cb2d3e 0%, #ef473a 100%) !important; }
         .btn-volver { background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%) !important; }
         
         .soporte-card { 
             background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 15px; 
-            margin-bottom: 15px; border-left: 5px solid #00c6ff; text-align: left;
+            margin-bottom: 15px; border-left: 5px solid var(--azul-wntv); text-align: left;
             backdrop-filter: blur(10px);
         }
-        .user-tag { color: #00c6ff; font-weight: bold; text-transform: uppercase; font-size: 1.1rem; }
+        .user-tag { color: var(--azul-wntv); font-weight: bold; text-transform: uppercase; font-size: 1.1rem; }
 
         textarea { 
             width: 100%; height: 80px; background: rgba(0,0,0,0.3); color: #fff; 
@@ -132,10 +128,7 @@
 </head>
 <body>
     <div class="container">
-        <div class="logo-principal">
-            <img src="img/logo.png" alt="Logo WNTV">
-        </div>
-
+        <div class="logo-principal"><img src="img/logo.png" alt="Logo WNTV"></div>
         <h1 class="neon-text">SOPORTE NOCTURNO</h1>
 
         <div id="login-section">
@@ -145,14 +138,14 @@
         </div>
 
         <div id="admin-panel" class="hidden" style="max-width: 850px; margin: auto;">
-            <h2 style="color: #00c6ff; margin-bottom: 20px;">⚙️ Control Maestro - JC</h2>
+            <h2 style="color: var(--azul-wntv); margin-bottom: 20px;">⚙️ Control Maestro - JC</h2>
             <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px;">
                 <input type="text" id="nombre-cliente" class="input-login" placeholder="Nombre del Usuario">
                 <button onclick="agregarCliente()" class="btn-main btn-admin" style="width: auto; padding: 12px 30px; margin-top: 10px;">+ Agregar</button>
             </div>
             
             <div style="margin: 25px 0; display: flex; gap: 10px; justify-content: center; align-items: center; flex-wrap: wrap;">
-                <input type="date" id="filtro-calendario" class="input-login" onchange="window.filtrarPorFecha(this.value)">
+                <input type="text" id="filtro-calendario" class="input-login" placeholder="📅 Ver Fecha">
                 <button onclick="exportarPDF(false)" class="btn-pdf-diario">📄 PDF Diario</button>
                 <button onclick="exportarPDF(true)" class="btn-pdf-historico">📥 Reporte Histórico JC</button>
             </div>
@@ -168,13 +161,10 @@
             </div>
             <div id="lista-clientes-soporte"></div>
             <button onclick="guardarTodoElSoporte()" class="btn-main btn-soporte-verde">💾 Guardar Actividades y Enviar</button>
-            
             <div id="log-historial-nocturno" style="margin-top: 30px;"></div>
-
             <button onclick="window.location.reload()" class="btn-main btn-volver" style="margin-top:30px; max-width: 200px;">⬅ Volver</button>
         </div>
     </div>
-
     <script type="module" src="soporte.js"></script>
 </body>
 </html>
