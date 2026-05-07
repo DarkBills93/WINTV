@@ -4,67 +4,53 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Soporte Nocturno - WNTV</title>
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
-    
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Segoe UI', sans-serif;
-            color: #e6f1f5;
-            min-height: 100vh;
+            font-family: 'Segoe UI', sans-serif; color: #e6f1f5; min-height: 100vh;
             background: radial-gradient(circle at center, #022b50 0%, #000000 100%);
-            background-attachment: fixed;
+            background-attachment: fixed; position: relative; overflow-x: hidden;
         }
-
-        /* Marca de agua */
         body::after {
             content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1; background-image: url('img/logo.png'); 
-            background-repeat: repeat; background-size: 140px; opacity: 0.05; pointer-events: none;
+            z-index: -1; background-image: url('img/logo.png'); background-repeat: repeat;
+            background-size: 140px; opacity: 0.05; pointer-events: none;
         }
-
         .container { padding: 40px 20px; text-align: center; }
         .hidden { display: none; }
-        
         .logo-principal {
-            background: white; border-radius: 50%; padding: 15px; width: 160px; height: 160px;
+            background: white; border-radius: 50%; padding: 15px; width: 150px; height: 150px;
             margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;
             box-shadow: 0 0 30px rgba(0, 198, 255, 0.6);
         }
-        .logo-principal img { width: 120px; }
-
+        .logo-principal img { width: 110px; }
         .neon-text { 
             color: #ffffff; text-shadow: 0 0 10px #00c6ff, 0 0 20px #00c6ff; 
-            font-size: 2.3rem; margin-bottom: 30px; font-weight: bold;
+            font-size: 2.2rem; margin-bottom: 30px; font-weight: bold;
         }
-
-        /* DISEÑO DE BOTONES VERTICALES (Imagen 1) */
+        /* BOTONES VERTICALES */
         .login-box { display: flex; flex-direction: column; align-items: center; gap: 15px; }
-        
         .input-login { 
-            width: 100%; max-width: 380px; padding: 14px; border-radius: 8px; 
+            width: 100%; max-width: 350px; padding: 14px; border-radius: 8px; 
             border: 1px solid #00c6ff; background: rgba(0, 0, 0, 0.6); color: #fff;
         }
-
         .btn-main { 
-            width: 100%; max-width: 380px; padding: 16px; border-radius: 12px; border: none; 
+            width: 100%; max-width: 350px; padding: 15px; border-radius: 12px; border: none; 
             background: linear-gradient(135deg, #0072ff, #00c6ff); color: white; 
-            font-weight: bold; cursor: pointer; font-size: 1rem;
+            font-weight: bold; cursor: pointer; transition: 0.3s;
         }
-
         .btn-secondary { background: linear-gradient(135deg, #2c3e50, #000000); border: 1px solid #7000ff; }
-
-        /* TABLA Y ELEMENTOS (Imagen 3) */
-        table { width: 100%; margin-top: 20px; border-collapse: collapse; }
-        th { color: #00c6ff; padding: 15px; border-bottom: 2px solid #00c6ff; text-align: left; }
-        td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); text-align: left; }
-
-        .btn-delete { background: #e74c3c; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; }
-        .btn-back { margin-top: 30px; width: 180px; }
+        .btn-main:hover { transform: scale(1.02); box-shadow: 0 0 20px rgba(0,198,255,0.5); }
         
-        .soporte-card { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; margin-bottom: 10px; text-align: left; }
+        /* TABLAS Y CARDS */
+        table { width: 100%; margin-top: 20px; border-collapse: collapse; background: rgba(255,255,255,0.02); }
+        th { color: #00c6ff; padding: 12px; border-bottom: 2px solid #00c6ff; text-align: left; }
+        td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); text-align: left; }
+        .btn-delete { background: #ff4757; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
+        .soporte-card { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; margin-bottom: 15px; text-align: left; border-left: 4px solid #00c6ff; }
+        textarea { width: 100%; height: 70px; background: rgba(0,0,0,0.3); color: white; border: 1px solid #1a2a3a; border-radius: 5px; padding: 8px; margin-top: 8px; }
     </style>
 </head>
 <body>
@@ -72,48 +58,41 @@
         <div class="logo-principal"><img src="img/logo.png" alt="WNTV"></div>
         <h1 class="neon-text">SOPORTE NOCTURNO</h1>
 
-        <!-- SECCIÓN INICIO -->
         <div id="login-section" class="login-box">
             <input type="password" id="pass-admin" class="input-login" placeholder="Contraseña Administrador">
             <button onclick="checkLogin()" class="btn-main">ENTRAR COMO ADMIN</button>
             <button onclick="showUserPanel()" class="btn-main btn-secondary">ACCESO SOPORTE NOCTURNO</button>
         </div>
 
-        <!-- PANEL ADMIN (Imagen 3 corregida) -->
         <div id="admin-panel" class="hidden">
-            <h2 style="color: #00c6ff;">⚙️ Control Maestro - JC</h2>
-            <div style="margin: 20px 0;">
-                <input type="text" id="nombre-cliente" class="input-login" style="max-width: 250px;" placeholder="Nombre del Usuario">
+            <h2 style="color: #00c6ff; margin-bottom: 20px;">⚙️ Control Maestro - JC</h2>
+            <div style="margin-bottom: 25px;">
+                <input type="text" id="nombre-cliente" class="input-login" style="max-width: 200px;" placeholder="Usuario">
                 <button onclick="agregarCliente()" class="btn-main" style="width: auto; padding: 10px 20px;">+ Agregar</button>
             </div>
-            
-            <div style="margin-bottom: 20px; display: flex; justify-content: center; gap: 10px;">
+            <div style="margin-bottom: 20px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
                 <input type="date" id="filtro-calendario" class="input-login" style="width: auto;">
-                <button onclick="exportarPDF(false)" style="background:#e67e22; padding: 10px; border-radius: 8px; color: white; border:none;">📄 PDF Diario</button>
-                <button onclick="exportarPDF(true)" style="background:#27ae60; padding: 10px; border-radius: 8px; color: white; border:none;">📥 Reporte Histórico JC</button>
+                <button onclick="exportarPDF(false)" style="background:#e67e22; color:white; border:none; padding:10px 15px; border-radius:8px; cursor:pointer;">📄 PDF Diario</button>
+                <button onclick="exportarPDF(true)" style="background:#27ae60; color:white; border:none; padding:10px 15px; border-radius:8px; cursor:pointer;">📥 Reporte JC</button>
             </div>
-
-            <table id="tabla-admin">
+            <table>
                 <thead>
-                    <tr><th>CLIENTE</th><th>ESTADO</th><th>ELIMINAR</th></tr>
+                    <tr><th>CLIENTE</th><th>ESTADO</th><th>ACCIÓN</th></tr>
                 </thead>
                 <tbody id="monitor-lista"></tbody>
             </table>
-            <button onclick="window.location.reload()" class="btn-main btn-secondary btn-back">⬅ Retroceder</button>
+            <button onclick="window.location.reload()" class="btn-main btn-secondary" style="margin-top:30px; width:150px;">⬅ Volver</button>
         </div>
 
-        <!-- PANEL TÉCNICO (Imagen 2) -->
         <div id="user-panel" class="hidden">
-            <p style="color: #00c6ff; margin-bottom: 10px; font-weight: bold;">TÉCNICO DE TURNO:</p>
-            <input type="text" id="nombre-tecnico" class="input-login" placeholder="Ej: María, Frank, Luis...">
-            <div id="lista-clientes-soporte" style="margin-top: 20px;"></div>
-            <button onclick="guardarTodoElSoporte()" class="btn-main" style="margin-top: 20px;">💾 Guardar Actividades y Enviar</button>
-            
-            <div id="log-historial-nocturno" style="margin-top: 30px;">
-                <h4 style="color: #00c6ff; border-bottom: 1px solid #00c6ff; padding-bottom: 5px;">Historial Reciente (Solo Hoy):</h4>
+            <input type="text" id="nombre-tecnico" class="input-login" placeholder="Tu nombre (María, Frank...)">
+            <div id="lista-clientes-soporte" style="margin-top:20px;"></div>
+            <button onclick="guardarTodoElSoporte()" class="btn-main" style="margin:20px 0;">💾 Guardar y Enviar</button>
+            <div id="log-historial-nocturno">
+                <h4 style="color:#00c6ff; border-bottom:1px solid #00c6ff; padding-bottom:5px; text-align:left;">Trabajos de Hoy (Día 8):</h4>
                 <div id="log-hoy"></div>
             </div>
-            <button onclick="window.location.reload()" class="btn-main btn-secondary btn-back">⬅ Retroceder</button>
+            <button onclick="window.location.reload()" class="btn-main btn-secondary" style="margin-top:30px; width:150px;">⬅ Volver</button>
         </div>
     </div>
     <script type="module" src="soporte.js"></script>
