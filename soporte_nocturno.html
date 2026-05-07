@@ -56,19 +56,33 @@
             font-weight: bold;
             text-transform: uppercase;
         }
+
+        /* AJUSTE PARA ALINEACIÓN VERTICAL CENTRADA */
+        #login-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px; /* Espacio entre elementos */
+            width: 100%;
+        }
+
         .input-login { 
             width: 100%; max-width: 350px; padding: 12px; border-radius: 8px; 
             border: 1px solid rgba(0, 198, 255, 0.3); background: rgba(0, 0, 0, 0.5); 
-            color: #fff; margin-bottom: 15px; outline: none;
+            color: #fff; outline: none; text-align: center;
         }
         .btn-main { 
             width: 100%; max-width: 350px; padding: 14px; border-radius: 12px; border: none; 
             background: linear-gradient(135deg, #0072ff 0%, #00c6ff 100%); color: white; 
             font-weight: bold; cursor: pointer; transition: all 0.3s ease;
             box-shadow: 0 0 15px rgba(0, 198, 255, 0.4);
-            margin-bottom: 10px;
         }
-        .btn-secondary { background: linear-gradient(135deg, #434343 0%, #000000 100%); border: 1px solid #7000ff; }
+        .btn-secondary { 
+            background: linear-gradient(135deg, #434343 0%, #000000 100%); 
+            border: 1px solid #7000ff; 
+        }
+        
         .soporte-card { 
             background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 15px; 
             margin-bottom: 15px; border-left: 5px solid #00c6ff; text-align: left;
@@ -102,11 +116,11 @@
             <h2 style="color: #00c6ff; margin-bottom: 20px;">⚙️ Control Maestro - JC</h2>
             <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px;">
                 <input type="text" id="nombre-cliente" class="input-login" placeholder="Nombre del Usuario">
-                <button onclick="agregarCliente()" class="btn-main" style="width: auto; padding: 12px 30px;">+ Agregar</button>
+                <button onclick="agregarCliente()" class="btn-main" style="width: auto; padding: 12px 30px; margin-top: 10px;">+ Agregar</button>
             </div>
             
             <div style="margin: 25px 0; display: flex; gap: 10px; justify-content: center; align-items: center; flex-wrap: wrap;">
-                <input type="date" id="filtro-calendario" class="input-login" style="width: auto; margin-bottom: 0;" onchange="filtrarPorFecha(this.value)">
+                <input type="date" id="filtro-calendario" class="input-login" style="width: auto;" onchange="filtrarPorFecha(this.value)">
                 <button onclick="exportarPDF(false)" style="background:#e67e22; color:white; padding:12px 20px; border:none; border-radius:8px; cursor:pointer; font-weight: bold;">📄 PDF Diario</button>
                 <button onclick="exportarPDF(true)" style="background:#27ae60; color:white; padding:12px 20px; border:none; border-radius:8px; cursor:pointer; font-weight: bold;">📥 Reporte Histórico JC</button>
             </div>
