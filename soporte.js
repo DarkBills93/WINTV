@@ -23,33 +23,36 @@ function iniciarSincronizacion() {
         if (!document.getElementById('user-panel').classList.contains('hidden')) renderizarClientesTecnico();
     });
 
+    // Historial real desde la colección Soporte
     onSnapshot(query(collection(db, "Soporte"), orderBy("Fecha", "desc")), (snapshot) => {
         historialSoporte = snapshot.docs.map(doc => doc.data());
-        actualizarHistorialLog(); // Función separada para controlar el conteo
+        actualizarHistorialLog();
     });
 }
 
-// CORRECCIÓN: Ahora el historial muestra TODOS los registros de hoy (pendientes y atendidos)
 function actualizarHistorialLog() {
     const contenedor = document.getElementById('log-historial-nocturno');
     if (contenedor) {
-        // Filtramos de la colección principal para tener el conteo total de hoy
-        const deHoy = clientesNocturnos.filter(c => {
-            if(!c.Fecha) return false;
-            return new Date(c.Fecha.seconds * 1000).toLocaleDateString('en-CA') === FECHA_HOY;
+        const deHoy = historialSoporte.filter(h => {
+            if(!h.Fecha) return false;
+            return new Date(h.Fecha.seconds * 1000).toLocaleDateString('en-CA') === FECHA_HOY;
         });
 
-        contenedor.innerHTML = `<h4 style="color: #00c6ff; margin-bottom:10px;">Trabajos de Hoy (Total: ${deHoy.length}):</h4>` + 
-            deHoy.map(h => `
-                <div style="border-bottom: 1px solid #1a2a3a; padding: 10px; font-size: 0.9em; text-align:left;">
-                    <b style="color:#00c6ff;">${h.Cliente}</b> 
-                    <span style="color:${h.Estado === 'ATENDIDO' ? '#2ecc71' : '#f1c40f'};">
-                        (${h.Estado === 'ATENDIDO' ? (h.Soporte || 'Técnico') : 'Pendiente'})
-                    </span>: ${h.Solucion || 'Esperando atención...'}
-                </div>`).join('');
+        contenedor.innerHTML = `
+            <h4 style="color: #00c6ff; margin-bottom:15px; text-align:left;">
+                Trabajos de Hoy (Total: ${deHoy.length}):
+            </h4>
+            ${deHoy.map(h => `
+                <div style="border-bottom: 1px solid rgba(0, 198, 255, 0.2); padding: 12px; font-size: 0.95em; text-align:left;">
+                    <b style="color:#ffffff;">${h.Cliente}</b> 
+                    <span style="color:#2ecc71;">(${h.Soporte})</span>: 
+                    <span style="color:#e6f1f5;">${h.Solucion}</span>
+                </div>`).join('')}
+        `;
     }
 }
 
+// LOGIN Y NAVEGACIÓN
 window.checkLogin = function() {
     if(document.getElementById('pass-admin').value === "SOPORTENOCTURNO") {
         document.getElementById('login-section').classList.add('hidden');
@@ -64,6 +67,7 @@ window.showUserPanel = function() {
     iniciarSincronizacion();
 };
 
+// GESTIÓN DE CLIENTES
 window.agregarCliente = async function() {
     const input = document.getElementById('nombre-cliente');
     const nombre = input.value.trim().toUpperCase();
@@ -79,16 +83,15 @@ window.agregarCliente = async function() {
     }
 };
 
-// NUEVA FUNCIÓN: Para eliminar registros directamente desde la tabla
 window.eliminarFila = async function(id) {
-    if(confirm("¿Deseas eliminar este registro permanentemente?")) {
+    if(confirm("¿Deseas eliminar este registro?")) {
         await deleteDoc(doc(db, "Administrador", id));
     }
 };
 
 window.guardarTodoElSoporte = async function() {
-    const nombreDelTecnico = document.getElementById('nombre-tecnico').value.trim().toUpperCase();
-    if(!nombreDelTecnico) return alert("Escribe tu nombre de técnico");
+    const tecnico = document.getElementById('nombre-tecnico').value.trim().toUpperCase();
+    if(!tecnico) return alert("Escribe tu nombre de técnico");
 
     const pendientes = clientesNocturnos.filter(c => c.Estado === "pendiente");
     for (let c of pendientes) {
@@ -97,12 +100,12 @@ window.guardarTodoElSoporte = async function() {
             await addDoc(collection(db, "Soporte"), { 
                 Cliente: c.Cliente, 
                 Solucion: texto, 
-                Soporte: nombreDelTecnico, 
+                Soporte: tecnico, 
                 Fecha: serverTimestamp() 
             });
             await updateDoc(doc(db, "Administrador", c.id), { 
                 Estado: "ATENDIDO", 
-                Soporte: nombreDelTecnico, // Guardamos quién atendió
+                Soporte: tecnico, 
                 Solucion: texto 
             });
         }
@@ -119,7 +122,6 @@ function renderizarClientesTecnico() {
         </div>`).join('');
 }
 
-// CORRECCIÓN: Columna ACCIÓN con botones de eliminar
 function actualizarMonitorAdmin(listaFiltrada = null) {
     const datos = listaFiltrada || clientesNocturnos;
     document.getElementById('monitor-lista').innerHTML = `
@@ -140,55 +142,58 @@ function actualizarMonitorAdmin(listaFiltrada = null) {
         </table>`;
 }
 
+// FILTRO CALENDARIO
+window.filtrarPorFecha = function(fecha) {
+    if (!fecha) return actualizarMonitorAdmin();
+    const filtrados = clientesNocturnos.filter(c => {
+        if(!c.Fecha) return false;
+        return new Date(c.Fecha.seconds * 1000).toLocaleDateString('en-CA') === fecha;
+    });
+    actualizarMonitorAdmin(filtrados);
+};
+
+// EXPORTACIÓN PDF PROFESIONAL
 window.exportarPDF = function(todo = false) {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF('p', 'mm', 'a4');
     const fechaFiltro = document.getElementById('filtro-calendario')?.value;
     
     let datosParaPDF = [...historialSoporte];
-
     if (!todo && fechaFiltro) {
         datosParaPDF = datosParaPDF.filter(h => {
             if(!h.Fecha) return false;
-            const fDoc = new Date(h.Fecha.seconds * 1000).toLocaleDateString('en-CA');
-            return fDoc === fechaFiltro;
+            return new Date(h.Fecha.seconds * 1000).toLocaleDateString('en-CA') === fechaFiltro;
         });
     }
 
-    doc.setFontSize(20);
-    doc.setTextColor(0, 123, 255); 
-    doc.text("REPORTE DE ACTIVIDADES WNTV", 105, 20, { align: "center" });
-    
-    doc.setFontSize(10);
-    doc.setTextColor(100);
-    doc.text(`ADMINISTRADOR GENERAL: JC`, 14, 35);
-    doc.text(`FECHA REPORTE: ${fechaFiltro || new Date().toLocaleDateString()}`, 14, 40);
-    doc.line(14, 45, 196, 45);
+    // Logo y Título
+    doc.addImage('img/logo.png', 'PNG', 15, 10, 45, 25); 
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(22);
+    doc.text("INFORME DE ATENCIONES", 110, 22, { align: "center" });
+    doc.text("NOCTURNAS", 110, 32, { align: "center" });
 
-    const filas = datosParaPDF.map(h => [
-        h.Cliente, 
-        h.Soporte, 
-        h.Fecha ? new Date(h.Fecha.seconds * 1000).toLocaleDateString() : '---',
-        h.Solucion
-    ]);
+    // Línea divisora azul
+    doc.setDrawColor(52, 152, 219);
+    doc.setLineWidth(1);
+    doc.line(15, 45, 195, 45);
 
+    // Info del Responsable
+    doc.setFontSize(11);
+    doc.text(`RESPONSABLE: JC`, 15, 55);
+    doc.text(`SEDES: TINGO MARIA – HUANUCO – LIMA`, 15, 62);
+    doc.text(`FECHA: ${fechaFiltro || new Date().toLocaleDateString('es-PE')}`, 15, 69);
+
+    // Tabla
+    const filas = datosParaPDF.map(h => [h.Cliente, h.Soporte, h.Solucion]);
     doc.autoTable({
-        startY: 50,
-        head: [['CLIENTE', 'TÉCNICO', 'FECHA', 'SOLUCIÓN']],
+        startY: 75,
+        head: [['CLIENTE', 'ATENDIDO POR', 'TRABAJO REALIZADO']],
         body: filas,
-        theme: 'striped',
-        headStyles: { fillColor: [0, 123, 255] }
+        theme: 'grid',
+        headStyles: { fillColor: [41, 128, 185], textColor: 255, halign: 'center' },
+        styles: { fontSize: 9 }
     });
 
-    doc.save(`Reporte_WNTV_${fechaFiltro || 'Historial'}.pdf`);
-};
-
-window.filtrarPorFecha = function(fecha) {
-    if (!fecha) return actualizarMonitorAdmin();
-    const filtrados = clientesNocturnos.filter(c => {
-        if(!c.Fecha) return false;
-        const fDoc = new Date(c.Fecha.seconds * 1000).toLocaleDateString('en-CA');
-        return fDoc === fecha;
-    });
-    actualizarMonitorAdmin(filtrados);
+    doc.save(`Informe_WNTV_${fechaFiltro || 'Historico'}.pdf`);
 };
