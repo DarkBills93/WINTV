@@ -9,80 +9,63 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     
     <style>
-        body { background-color: #050b14; color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; }
+        body { background-color: #050b14; color: white; font-family: 'Segoe UI', sans-serif; margin: 0; }
         .hidden { display: none; }
         .container { padding: 20px; text-align: center; }
         
-        /* --- ESTILO DE LOGO MEJORADO (EFECTO GLOW) --- */
+        /* ESTILO DE LOGO CON BRILLO AMARILLO SUAVE */
         .logo-wrapper {
             width: 180px; height: 180px;
-            background-color: #ffffff; /* Fondo blanco puro */
+            background-color: #ffffff;
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             margin: 0 auto 15px;
-            /* Resplandor amarillo suave como el de tu imagen */
             box-shadow: 0 0 40px rgba(255, 255, 100, 0.4), 0 0 70px rgba(255, 255, 0, 0.2);
-            transition: transform 0.3s ease;
         }
         .logo-wrapper img { width: 85%; height: auto; border-radius: 50%; }
-        .logo-wrapper:hover { transform: scale(1.05); }
 
-        .neon-text { color: #ffffff; text-shadow: 0 0 10px #00c6ff, 0 0 20px #00c6ff; font-size: 2.5em; margin: 10px 0; }
-
-        /* Estilos de inputs y botones */
-        .input-login { width: 100%; max-width: 350px; padding: 12px; border-radius: 8px; border: 1px solid #1a2a3a; background: #0d1621; color: #fff; margin-bottom: 15px; box-sizing: border-box; }
-        .btn-main { width: 100%; max-width: 350px; padding: 14px; border-radius: 10px; border: none; background: linear-gradient(135deg, #00c6ff 0%, #007bff 100%); color: white; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .btn-secondary { background: #34495e; margin-top: 10px; color: #bdc3c7; }
+        .neon-text { color: #ffffff; text-shadow: 0 0 10px #00c6ff; font-size: 2.5em; margin: 10px 0; }
+        .input-login { width: 100%; max-width: 350px; padding: 12px; border-radius: 8px; border: 1px solid #1a2a3a; background: #0d1621; color: #fff; margin-bottom: 15px; }
+        .btn-main { width: 100%; max-width: 350px; padding: 14px; border-radius: 10px; border: none; background: linear-gradient(135deg, #00c6ff 0%, #007bff 100%); color: white; font-weight: bold; cursor: pointer; }
+        .btn-secondary { background: #34495e; margin-top: 10px; }
         
         .soporte-card { background: rgba(255, 255, 255, 0.03); padding: 15px; border-radius: 12px; margin-bottom: 15px; border-left: 4px solid #00c6ff; text-align: left; }
-        textarea { width: 100%; height: 70px; background: #080f18; color: #fff; border: 1px solid #1a2a3a; border-radius: 6px; padding: 10px; box-sizing: border-box; margin-top: 10px; }
-        
-        .admin-controls { margin: 20px 0; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; }
+        textarea { width: 100%; height: 70px; background: #080f18; color: #fff; border: 1px solid #1a2a3a; border-radius: 6px; padding: 10px; box-sizing: border-box; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <div class="logo-wrapper">
-                <img src="img/logo.png" alt="Logo WNTV">
-            </div>
+            <div class="logo-wrapper"><img src="img/logo.png" alt="Logo"></div>
             <h1 class="neon-text">SOPORTE NOCTURNO</h1>
         </div>
 
         <div id="login-section">
-            <input type="password" id="pass-admin" class="input-login" placeholder="Contraseña de acceso">
+            <input type="password" id="pass-admin" class="input-login" placeholder="Contraseña">
             <button onclick="checkLogin()" class="btn-main">ENTRAR COMO ADMIN</button>
-            <button onclick="showUserPanel()" class="btn-main btn-secondary">ACCESO TÉCNICOS</button>
+            <button onclick="showUserPanel()" class="btn-main btn-secondary">ACCESO SOPORTE NOCTURNO</button>
         </div>
 
         <div id="admin-panel" class="hidden" style="max-width: 850px; margin: auto;">
             <h2 style="color: #00c6ff;">⚙️ Control Maestro - JC</h2>
-            <div class="admin-controls">
-                <input type="text" id="nombre-cliente" class="input-login" placeholder="Nombre del Usuario">
-                <button onclick="agregarCliente()" class="btn-main" style="width: auto; padding: 10px 25px;">+ Agregar</button>
+            <input type="text" id="nombre-cliente" class="input-login" placeholder="Nombre del Usuario">
+            <button onclick="agregarCliente()" class="btn-main" style="width: auto;">+ Agregar</button>
+            <div style="margin: 20px 0;">
+                <input type="date" id="filtro-calendario" onchange="filtrarPorFecha(this.value)">
+                <button onclick="exportarPDF(false)" style="background:#e67e22; color:white; padding:10px; border-radius:5px;">PDF Diario</button>
+                <button onclick="exportarPDF(true)" style="background:#27ae60; color:white; padding:10px; border-radius:5px;">Descargar Todo</button>
             </div>
-            
-            <div style="margin-bottom: 20px;">
-                <input type="date" id="filtro-calendario" onchange="filtrarPorFecha(this.value)" style="padding: 10px; border-radius: 5px; border: none;">
-                <button onclick="exportarPDF(false)" style="background:#e67e22; padding:10px 15px; border:none; color:white; border-radius:5px; cursor:pointer; margin-left:10px;">PDF Diario</button>
-                <button onclick="exportarPDF(true)" style="background:#27ae60; padding:10px 15px; border:none; color:white; border-radius:5px; cursor:pointer; margin-left:10px;">Descargar Todo</button>
-            </div>
-            
             <div id="monitor-lista"></div>
             <button onclick="window.location.reload()" class="btn-main btn-secondary">Cerrar Sesión</button>
         </div>
 
         <div id="user-panel" class="hidden" style="max-width: 600px; margin: auto;">
-            <h3>📝 Hoja de Trabajo</h3>
-            <input type="text" id="nombre-tecnico" class="input-login" placeholder="Nombre del Técnico de Turno">
+            <input type="text" id="nombre-tecnico" class="input-login" placeholder="Nombre del Técnico">
             <div id="lista-clientes-soporte"></div>
             <button onclick="guardarTodoElSoporte()" class="btn-main">💾 Guardar y Enviar</button>
-            <button onclick="window.location.reload()" class="btn-main btn-secondary">Regresar</button>
-            
-            <div id="log-historial-nocturno" style="margin-top: 30px; text-align: left;"></div>
+            <div id="log-historial-nocturno"></div>
         </div>
     </div>
-
     <script type="module" src="soporte.js"></script>
 </body>
 </html>
