@@ -1,7 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, query, onSnapshot, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// Configuración de Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyBg15QlVDXJMjBT7_1B-e-S3NYfvjHJ7FI",
     authDomain: "soporte-nocturno.firebaseapp.com",
@@ -18,17 +17,25 @@ let clientesNocturnos = [];
 let historialSoporte = [];
 const FECHA_HOY = new Date().toLocaleDateString('en-CA');
 
-// --- FUNCIONES DE SINCRONIZACIÓN ---
+// Inicialización de Calendario con Flatpickr
+document.addEventListener("DOMContentLoaded", () => {
+    flatpickr("#filtro-calendario", {
+        locale: "es",
+        dateFormat: "Y-m-d",
+        defaultDate: "today",
+        onChange: function(selectedDates, dateStr) {
+            window.filtrarPorFecha(dateStr);
+        }
+    });
+});
 
 function iniciarSincronizacion() {
     onSnapshot(query(collection(db, "Administrador"), orderBy("Fecha", "desc")), (snapshot) => {
         clientesNocturnos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        
         if (!document.getElementById('admin-panel').classList.contains('hidden')) {
             const fechaFiltro = document.getElementById('filtro-calendario').value;
-            window.filtrarPorFecha(fechaFiltro); // Refresco dinámico automático
+            window.filtrarPorFecha(fechaFiltro); 
         }
-        
         if (!document.getElementById('user-panel').classList.contains('hidden')) {
             renderizarClientesTecnico();
         }
@@ -75,17 +82,13 @@ function renderizarClientesTecnico() {
     }
 }
 
-// --- VINCULACIÓN CON EL HTML (OBJETO WINDOW) ---
-
 window.checkLogin = function() {
     const pass = document.getElementById('pass-admin').value;
     if(pass === "SOPORTENOCTURNO") {
         document.getElementById('login-section').classList.add('hidden');
         document.getElementById('admin-panel').classList.remove('hidden');
         iniciarSincronizacion();
-    } else { 
-        alert("Clave Incorrecta"); 
-    }
+    } else { alert("Clave Incorrecta"); }
 };
 
 window.showUserPanel = function() {
@@ -100,11 +103,7 @@ window.agregarCliente = async function() {
     if(nombre) {
         try {
             await addDoc(collection(db, "Administrador"), { 
-                Cliente: nombre, 
-                Estado: "pendiente", 
-                Fecha: serverTimestamp(), 
-                SNV2: "JC", 
-                Solucion: "" 
+                Cliente: nombre, Estado: "pendiente", Fecha: serverTimestamp(), SNV2: "JC", Solucion: "" 
             });
             input.value = "";
         } catch (e) { console.error("Error al agregar:", e); }
@@ -113,7 +112,7 @@ window.agregarCliente = async function() {
 
 window.eliminarFila = async function(id) {
     if(confirm("¿Deseas eliminar este registro?")) {
-        await deleteDoc(doc(doc(db, "Administrador", id)));
+        await deleteDoc(doc(db, "Administrador", id));
     }
 };
 
@@ -128,23 +127,16 @@ window.guardarTodoElSoporte = async function() {
     for (let c of pendientes) {
         const textarea = document.getElementById(`texto-${c.id}`);
         const texto = textarea ? textarea.value.trim() : "";
-        
         if(texto) {
             await addDoc(collection(db, "Soporte"), { 
-                Cliente: c.Cliente, 
-                Solucion: texto, 
-                Soporte: tecnico, 
-                Fecha: serverTimestamp() 
+                Cliente: c.Cliente, Solucion: texto, Soporte: tecnico, Fecha: serverTimestamp() 
             });
             await updateDoc(doc(db, "Administrador", c.id), { 
-                Estado: "ATENDIDO", 
-                Soporte: tecnico, 
-                Solucion: texto 
+                Estado: "ATENDIDO", Soporte: tecnico, Solucion: texto 
             });
             guardados++;
         }
     }
-    
     if(guardados > 0) alert("Sincronización completa");
     else alert("Por favor, escribe la solución antes de enviar.");
 };
@@ -154,7 +146,6 @@ window.filtrarPorFecha = function(fecha) {
     if(!contenedor) return;
 
     const fechaFiltro = fecha || ""; 
-
     const datos = !fechaFiltro ? clientesNocturnos : clientesNocturnos.filter(c => {
         if(!c.Fecha || !c.Fecha.seconds) return false;
         const d = new Date(c.Fecha.seconds * 1000);
@@ -175,7 +166,7 @@ window.filtrarPorFecha = function(fecha) {
                 </tr>
             </thead>
             <tbody>
-                ${datos.length === 0 ? `<tr><td colspan="3" style="padding:30px; color:#666; text-align:center;">No hay datos para esta fecha</td></tr>` : 
+                ${datos.length === 0 ? '<tr><td colspan="3" style="text-align:center;">No hay datos</td></tr>' : 
                 datos.map(c => `
                 <tr style="background: rgba(255,255,255,0.05); backdrop-filter: blur(5px);">
                     <td style="padding:12px; border-radius: 10px 0 0 10px; border-left: 4px solid ${c.Estado === 'ATENDIDO' ? '#96c93d' : '#ffa500'};">
@@ -188,7 +179,7 @@ window.filtrarPorFecha = function(fecha) {
                         </span>
                     </td>
                     <td style="padding:12px; text-align:center; border-radius: 0 10px 10px 0;">
-                        <button class="btn-del" onclick="window.eliminarFila('${c.id}')" style="box-shadow: 0 0 10px rgba(255, 71, 87, 0.2);">Eliminar</button>
+                        <button class="btn-del" onclick="window.eliminarFila('${c.id}')">Eliminar</button>
                     </td>
                 </tr>`).join('')}
             </tbody>
