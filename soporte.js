@@ -21,7 +21,6 @@ const FECHA_HOY = new Date().toLocaleDateString('en-CA');
 // --- FUNCIONES DE SINCRONIZACIÓN ---
 
 function iniciarSincronizacion() {
-    // Escuchar cambios en la colección Administrador
     onSnapshot(query(collection(db, "Administrador"), orderBy("Fecha", "desc")), (snapshot) => {
         clientesNocturnos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         
@@ -35,7 +34,6 @@ function iniciarSincronizacion() {
         }
     });
 
-    // Escuchar cambios en la colección Soporte para el log inferior
     onSnapshot(query(collection(db, "Soporte"), orderBy("Fecha", "desc")), (snapshot) => {
         historialSoporte = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         actualizarHistorialLog();
@@ -71,7 +69,7 @@ function renderizarClientesTecnico() {
     if (contenedor) {
         contenedor.innerHTML = lista.map((c) => `
             <div class="soporte-card">
-                <b style="color: #96c93d;">USUARIO: ${c.Cliente}</b>
+                <b class="user-tag">USUARIO: ${c.Cliente}</b>
                 <textarea id="texto-${c.id}" placeholder="Escribe la solución..."></textarea>
             </div>`).join('');
     }
@@ -227,5 +225,5 @@ window.exportarPDF = function(todo = false) {
         columnStyles: { 0: { cellWidth: 25 }, 1: { cellWidth: 40 }, 2: { cellWidth: 35 } }
     });
 
-    docPDF.save(`Informe_WNTV_${todo ? 'Historico' : (fechaCalendario || FECHA_HOY)}.pdf`);
+    docPDF.save(`Informe_JC_${todo ? 'Historico' : (fechaCalendario || FECHA_HOY)}.pdf`);
 };
