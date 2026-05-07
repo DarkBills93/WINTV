@@ -26,7 +26,7 @@ function iniciarSincronizacion() {
         
         if (!document.getElementById('admin-panel').classList.contains('hidden')) {
             const fechaFiltro = document.getElementById('filtro-calendario').value;
-            window.filtrarPorFecha(fechaFiltro);
+            window.filtrarPorFecha(fechaFiltro); // Refresco dinámico automático
         }
         
         if (!document.getElementById('user-panel').classList.contains('hidden')) {
@@ -50,12 +50,12 @@ function actualizarHistorialLog() {
         });
 
         contenedor.innerHTML = `
-            <h4 style="color: #96c93d; margin-bottom:15px; text-align:left;">
+            <h4 style="color: #00c6ff; margin-bottom:15px; text-align:left; font-weight: bold; text-transform: uppercase;">
                 Trabajos de Hoy (Total: ${deHoy.length}):
             </h4>
             ${deHoy.map(h => `
-                <div style="border-bottom: 1px solid rgba(150, 201, 61, 0.2); padding: 12px; font-size: 0.95em; text-align:left;">
-                    <b style="color:#ffffff;">${h.Cliente}</b> 
+                <div style="border-bottom: 1px solid rgba(0, 198, 255, 0.1); padding: 12px; font-size: 0.95em; text-align:left; background: rgba(0, 198, 255, 0.02);">
+                    <b style="color:#00c6ff;">${h.Cliente}</b> 
                     <span style="color:#96c93d;">(${h.Soporte})</span>: 
                     <span style="color:#e6f1f5;">${h.Solucion}</span>
                 </div>`).join('')}
@@ -153,23 +153,37 @@ window.filtrarPorFecha = function(fecha) {
     const contenedor = document.getElementById('monitor-lista');
     if(!contenedor) return;
 
-    const datos = !fecha ? clientesNocturnos : clientesNocturnos.filter(c => {
+    const fechaFiltro = fecha || ""; 
+
+    const datos = !fechaFiltro ? clientesNocturnos : clientesNocturnos.filter(c => {
         if(!c.Fecha || !c.Fecha.seconds) return false;
         const d = new Date(c.Fecha.seconds * 1000);
-        return d.toISOString().split('T')[0] === fecha;
+        const fechaDoc = d.toLocaleDateString('en-CA'); 
+        return fechaDoc === fechaFiltro;
     });
 
     contenedor.innerHTML = `
-        <table style="width:100%; color:white; border-collapse: collapse; font-size: 0.85em;">
-            <tr style="background: #1a2a3a; color: #00c6ff;">
+        <div style="margin-bottom: 10px; text-align: right; color: #00c6ff; font-size: 0.8em; font-weight: bold;">
+            REGISTROS ENCONTRADOS: ${datos.length}
+        </div>
+        <table style="width:100%; color:white; border-collapse: collapse; font-size: 0.85em; background: rgba(0,0,0,0.2); border-radius: 10px; overflow: hidden;">
+            <tr style="background: rgba(0, 198, 255, 0.1); color: #00c6ff;">
                 <th style="padding:12px; text-align:left;">CLIENTE</th>
                 <th style="padding:12px; text-align:center;">ESTADO</th>
                 <th style="padding:12px; text-align:center;">ACCIÓN</th>
             </tr>
-            ${datos.map(c => `
-                <tr style="border-bottom: 1px solid #1a2a3a;">
-                    <td style="padding:10px;">${c.Cliente} <br><small style="color:#aaa;">${c.Fecha?.seconds ? new Date(c.Fecha.seconds * 1000).toLocaleDateString() : '---'}</small></td>
-                    <td style="padding:10px; text-align:center;">${c.Estado === 'ATENDIDO' ? '✅' : '⏳'}</td>
+            ${datos.length === 0 ? `<tr><td colspan="3" style="padding:20px; color:#666;">No hay datos para esta fecha</td></tr>` : 
+            datos.map(c => `
+                <tr style="border-bottom: 1px solid rgba(0, 198, 255, 0.05);">
+                    <td style="padding:10px;">
+                        <b style="color: #00c6ff;">${c.Cliente}</b><br>
+                        <small style="color:#666;">${c.Fecha?.seconds ? new Date(c.Fecha.seconds * 1000).toLocaleTimeString() : '---'}</small>
+                    </td>
+                    <td style="padding:10px; text-align:center;">
+                        <span style="color: ${c.Estado === 'ATENDIDO' ? '#96c93d' : '#ffa500'}; font-weight: bold; font-size: 1.1em;">
+                            ${c.Estado === 'ATENDIDO' ? '✅' : '⏳'}
+                        </span>
+                    </td>
                     <td style="padding:10px; text-align:center;">
                         <button class="btn-del" onclick="window.eliminarFila('${c.id}')">Eliminar</button>
                     </td>
