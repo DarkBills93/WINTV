@@ -25,8 +25,8 @@ function iniciarSincronizacion() {
         const historial = snapshot.docs.map(doc => doc.data());
         const contenedor = document.getElementById('log-historial-nocturno');
         if (contenedor) {
-            contenedor.innerHTML = `<h4 style="color: #555;">Historial:</h4>` + historial.slice(0,10).map(h => `
-                <div style="border-bottom: 1px solid #1a2a3a; padding: 10px; font-size: 0.9em;">
+            contenedor.innerHTML = `<h4 style="color: #555;">Historial Reciente:</h4>` + historial.slice(0,10).map(h => `
+                <div style="border-bottom: 1px solid #1a2a3a; padding: 10px; font-size: 0.9em; text-align:left;">
                     <b style="color:#00c6ff;">${h.Cliente}</b> <span style="color:#2ecc71;">(${h.Soporte})</span>: ${h.Solucion}
                 </div>`).join('');
         }
@@ -88,15 +88,13 @@ function actualizarMonitorAdmin(listaFiltrada = null) {
             <tr style="background: #1a2a3a; color: #00c6ff;">
                 <th style="padding:12px; text-align:left;">CLIENTE</th>
                 <th style="padding:12px; text-align:center;">ESTADO</th>
-                <th style="padding:12px; text-align:center;">ADMINISTRADOR</th>
+                <th style="padding:12px; text-align:center;">TÉCNICO</th>
             </tr>
             ${datos.map(c => `
                 <tr style="border-bottom: 1px solid #1a2a3a;">
                     <td style="padding:10px;">${c.Cliente}</td>
-                    <td style="padding:10px; text-align:center;">
-                        ${c.Estado.toUpperCase() === 'ATENDIDO' ? '✅' : '⏳'}
-                    </td>
-                    <td style="padding:10px; text-align:center;">${c.SNV2 || 'PENDIENTE'}</td>
+                    <td style="padding:10px; text-align:center;">${c.Estado.toUpperCase() === 'ATENDIDO' ? '✅' : '⏳'}</td>
+                    <td style="padding:10px; text-align:center; color:#2ecc71;">${c.SNV2 || '---'}</td>
                 </tr>`).join('')}
         </table>`;
 }
@@ -110,11 +108,10 @@ window.filtrarPorFecha = function(fecha) {
     actualizarMonitorAdmin(filtrados);
 };
 
-// --- FUNCIÓN DE EXPORTACIÓN ESTILO FACTURA ACTUALIZADA ---
+// MODELO DE PDF ESTILO FACTURA (NO CAMBIADO)
 window.exportarPDF = function(todo = false) {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF('p', 'mm', 'a4');
-    
     const fechaFiltro = document.getElementById('filtro-calendario')?.value;
     let datos = clientesNocturnos;
 
@@ -124,69 +121,39 @@ window.exportarPDF = function(todo = false) {
         );
     }
 
-    // Encabezado Principal en Azul
     doc.setFontSize(22);
     doc.setTextColor(0, 123, 255); 
     doc.text("REPORTE DE SOPORTE", 105, 20, { align: "center" });
-    
-    // Subtítulo
     doc.setFontSize(10);
     doc.setTextColor(100);
     doc.text("WNTV - EXPERIENCIA SIN LÍMITES", 105, 27, { align: "center" });
-    
-    // Línea estética
     doc.setDrawColor(0, 123, 255);
-    doc.setLineWidth(0.5);
     doc.line(14, 35, 196, 35);
     
-    // Bloque de información del reporte (Texto Negro)
     doc.setFontSize(11);
     doc.setTextColor(0);
-    doc.text(`FECHA DE EMISIÓN: ${fechaFiltro || new Date().toLocaleDateString()}`, 14, 45);
-    doc.text(`RESPONSABLE: JC (ADMINISTRADOR)`, 14, 52);
-    doc.text(`TIPO DE REPORTE: ${todo ? 'HISTÓRICO GENERAL' : 'DIARIO DE ACTIVIDADES'}`, 14, 59);
+    doc.text(`FECHA: ${fechaFiltro || new Date().toLocaleDateString()}`, 14, 45);
+    doc.text(`RESPONSABLE: JC (ADMIN)`, 14, 52);
 
-    // Mapeo de datos para la tabla
     const filas = datos.map(c => [
         c.Cliente, 
-        c.SNV2 || "PENDIENTE", 
+        c.SNV2 && c.SNV2 !== 'PENDIENTE' ? c.SNV2 : '---', 
         c.Fecha ? new Date(c.Fecha.seconds * 1000).toLocaleDateString() : '---',
-        c.Solucion || 'SIN DETALLES REGISTRADOS'
+        c.Solucion || 'SIN DETALLES'
     ]);
 
-    // Tabla Estilo Factura con Títulos en Gris Oscuro
     doc.autoTable({
         startY: 65,
         head: [['CLIENTE', 'ATENDIDO POR', 'FECHA', 'TRABAJO REALIZADO']],
         body: filas,
         theme: 'grid',
-        headStyles: { 
-            fillColor: [44, 62, 80], // Gris oscuro azulado para los títulos de columna
-            textColor: [255, 255, 255],
-            fontStyle: 'bold',
-            halign: 'center'
-        },
-        styles: { 
-            fontSize: 9, 
-            cellPadding: 4,
-            overflow: 'linebreak',
-            valign: 'middle'
-        },
+        headStyles: { fillColor: [44, 62, 80], halign: 'center' },
+        styles: { fontSize: 9, overflow: 'linebreak' },
         columnStyles: {
-            0: { cellWidth: 45, fontStyle: 'bold' },
-            1: { cellWidth: 30, halign: 'center' },
-            2: { cellWidth: 25, halign: 'center' },
+            1: { halign: 'center', textColor: [39, 174, 96] },
             3: { cellWidth: 'auto' }
-        },
-        alternateRowStyles: { fillColor: [248, 249, 250] }
+        }
     });
 
-    // Pie de página
-    const finalY = doc.lastAutoTable.finalY + 10;
-    doc.setFontSize(9);
-    doc.setTextColor(150);
-    doc.text("Documento generado automáticamente por el sistema de Gestión Nocturna WNTV.", 14, finalY);
-
-    const nombreArchivo = todo ? "Reporte_General_WNTV.pdf" : `Reporte_Diario_${fechaFiltro || 'Soporte'}.pdf`;
-    doc.save(nombreArchivo);
+    doc.save(todo ? "Reporte_General.pdf" : `Reporte_${fechaFiltro || 'Soporte'}.pdf`);
 };
