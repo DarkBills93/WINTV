@@ -4,101 +4,69 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Soporte Nocturno - WNTV</title>
-    <link rel="stylesheet" href="css/style.css">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     
     <style>
+        body { background-color: #050505; color: white; font-family: sans-serif; }
         .hidden { display: none; }
+        .container { padding: 20px; }
         .soporte-card { background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 15px; margin-bottom: 15px; border-left: 5px solid #00c6ff; }
         .admin-panel, .user-panel { max-width: 800px; margin: 20px auto; }
-        .login-title { color: #00c6ff; text-align: center; font-weight: bold; margin-bottom: 15px; }
-        .input-login { width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #fff; background: rgba(0,0,0,0.3); color: #fff; margin-bottom: 15px; box-sizing: border-box; }
+        .input-login { width: 100%; padding: 12px; border-radius: 5px; border: 1px solid #333; background: rgba(255,255,255,0.05); color: #fff; margin-bottom: 15px; box-sizing: border-box; }
         .btn-admin-login { width: 100%; padding: 12px; border-radius: 10px; border: none; background: linear-gradient(to bottom, #00c6ff, #007bff); color: white; font-weight: bold; cursor: pointer; }
-        .btn-tech-login { width: 100%; padding: 12px; border-radius: 10px; border: none; background: #5b6fb3; color: white; font-weight: bold; cursor: pointer; margin-top: 15px; }
-        .btn-pdf { background: #e67e22; margin-top: 10px; }
-        .btn-pdf-all { background: #27ae60; margin-top: 10px; }
-        textarea { width: 100%; height: 80px; background: rgba(0, 0, 0, 0.4); color: #fff; border: 1px solid #00c6ff; border-radius: 8px; padding: 10px; }
+        .btn-tech-login { width: 100%; padding: 12px; border-radius: 10px; border: none; background: #5b6fb3; color: white; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        textarea { width: 100%; height: 80px; background: rgba(0, 0, 0, 0.4); color: #fff; border: 1px solid #00c6ff; border-radius: 8px; padding: 10px; box-sizing: border-box; }
 
-        /* --- NUEVO ESTILO DEL LOGO JC --- */
+        /* Estilo del Logo circular con brillo amarillo */
         .logo-container {
-            width: 180px;
-            height: 180px;
-            background-color: #FFFFFF; /* Fondo Blanco */
+            width: 180px; height: 180px;
+            background-color: #FFFFFF;
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto;
-            transition: all 0.5s ease;
-            cursor: pointer;
-            box-shadow: 0 0 25px rgba(255, 235, 59, 0.6); /* Brillo Amarillo inicial */
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 0 30px rgba(255, 235, 59, 0.7);
         }
-
-        .logo-container:hover {
-            background-color: #FFEB3B; /* Cambia a amarillo al pasar mouse */
-            box-shadow: 0 0 50px #FFEB3B, 0 0 80px #FDD835;
-            transform: scale(1.05);
-        }
-
-        .logo-container img {
-            width: 80%;
-            height: auto;
-            transition: transform 0.5s ease;
-        }
+        .logo-container img { width: 85%; height: auto; }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header" style="text-align: center; margin-bottom: 30px;">
+        <div class="header" style="text-align: center;">
             <div class="logo-container">
                 <img src="img/logo.png" alt="Logo WNTV">
             </div>
-            <h1 class="neon-text" style="margin-top: 20px;">SOPORTE NOCTURNO</h1>
+            <h1 style="color: #00c6ff; text-shadow: 0 0 10px #00c6ff;">SOPORTE NOCTURNO</h1>
         </div>
 
-        <div id="login-section" class="form-container" style="max-width: 400px; margin: auto;">
-            <div class="login-title">Acceso al Sistema</div>
+        <div id="login-section" style="max-width: 400px; margin: auto; text-align: center;">
             <input type="password" id="pass-admin" class="input-login" placeholder="Contraseña">
             <button onclick="checkLogin()" class="btn-admin-login">ADMINISTRADOR</button>
             <button onclick="showUserPanel()" class="btn-tech-login">SOPORTE NOCTURNO</button>
         </div>
 
         <div id="admin-panel" class="admin-panel hidden">
-            <h3 style="color: #00c6ff;">⚙️ Panel de Control - JC</h3>
-            
-            <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
-                <p style="color: #00c6ff; margin-bottom: 10px;">Añadir Nuevo Cliente:</p>
-                <input type="text" id="nombre-cliente" class="input-login" placeholder="Nombre del Usuario">
-                <button onclick="agregarCliente()" class="btn-admin-login">Añadir a la Lista</button>
+            <h3>⚙️ Panel Admin - JC</h3>
+            <input type="text" id="nombre-cliente" class="input-login" placeholder="Nombre del Usuario">
+            <button onclick="agregarCliente()" class="btn-admin-login">Añadir a la Lista</button>
+            <hr style="border: 1px solid #222; margin: 20px 0;">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <input type="date" id="filtro-calendario" onchange="filtrarPorFecha(this.value)" style="padding: 10px; border-radius: 5px;">
+                <button onclick="exportarPDF(false)" style="background:#e67e22; padding:10px; border:none; color:white; border-radius:5px; cursor:pointer; margin-left:10px;">Exportar Día</button>
+                <button onclick="exportarPDF(true)" style="background:#27ae60; padding:10px; border:none; color:white; border-radius:5px; cursor:pointer; margin-left:10px;">Exportar Todo</button>
             </div>
-
-            <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: center;">
-                <label style="color: white;">Filtrar Fecha:</label>
-                <input type="date" id="filtro-calendario" onchange="filtrarPorFecha(this.value)" style="padding: 8px; border-radius: 5px;">
-                
-                <button onclick="exportarPDF(false)" class="btn-admin-login btn-pdf" style="width: auto;">📄 Exportar Día</button>
-                <button onclick="exportarPDF(true)" class="btn-admin-login btn-pdf-all" style="width: auto;">🌍 Exportar Todo</button>
-            </div>
-
-            <div id="monitor-lista" style="margin-top: 20px;"></div>
-            
+            <div id="monitor-lista"></div>
             <button onclick="window.location.reload()" class="btn-tech-login">Cerrar Sesión</button>
         </div>
 
         <div id="user-panel" class="user-panel hidden">
-            <h2 style="color: #00c6ff;">📝 Registro de Actividades</h2>
-            <input type="text" id="nombre-tecnico" class="input-login" placeholder="Tu Nombre (Técnico de Turno)">
-            
+            <h2>📝 Registro Técnico</h2>
+            <input type="text" id="nombre-tecnico" class="input-login" placeholder="Nombre del Técnico">
             <div id="lista-clientes-soporte"></div>
-            
             <button onclick="guardarTodoElSoporte()" class="btn-admin-login">💾 Guardar Registro Final</button>
-            <button onclick="window.location.reload()" class="btn-tech-login">Volver al Inicio</button>
-            
-            <div id="log-historial-nocturno" style="margin-top: 30px; border-top: 1px solid #333; padding-top: 20px;">
-                <h4 style="color: #aaa; margin-bottom: 10px;">Últimas soluciones registradas:</h4>
-            </div>
+            <button onclick="window.location.reload()" class="btn-tech-login">Cerrar Sesión</button>
+            <div id="log-historial-nocturno" style="margin-top: 30px;"></div>
         </div>
     </div>
 
