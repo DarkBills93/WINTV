@@ -3,7 +3,6 @@ import {
     getFirestore, 
     collection, 
     addDoc, 
-    getDocs, 
     updateDoc, 
     doc, 
     query, 
@@ -108,7 +107,6 @@ function showUserPanel() {
     iniciarSincronizacionRealTime();
 }
 
-// FUNCIONES DE RENDERIZADO (Para que se vea la lista)
 function renderizarClientesTecnico() {
     const contenedor = document.getElementById('lista-clientes-soporte');
     contenedor.innerHTML = clientesNocturnos.map((c, i) => `
@@ -140,11 +138,8 @@ function actualizarMonitorAdmin() {
     `).join('');
 }
 
-// ESTO ES CLAVE: Exportar funciones al objeto window para que el HTML las vea
+// Vinculamos funciones al objeto window para el HTML
 window.checkLogin = checkLogin;
 window.showUserPanel = showUserPanel;
 window.agregarCliente = agregarCliente;
 window.guardarTodoElSoporte = guardarTodoElSoporte;
-// Nota: Las funciones renderizarClientesTecnico, mostrarHistorial y actualizarMonitorAdmin 
-// se mantienen casi iguales, solo asegúrate de que usen las mayúsculas: 
-// Ejemplo: c.Cliente en lugar de c.usuario.
