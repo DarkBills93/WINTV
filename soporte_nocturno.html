@@ -76,15 +76,15 @@
             color: #fff; outline: none; text-align: center;
         }
 
-        /* --- ESTILO CALENDARIO JC ACTUALIZADO --- */
+        /* --- ESTILO CALENDARIO JC ACTUALIZADO (Elegante y Circular) --- */
         #filtro-calendario {
-            background: transparent !important; /* Sin fondo */
-            border: 2px solid var(--naranja-fuego) !important; /* Borde Naranja */
-            border-radius: 50px !important; /* Forma Circular/Píldora */
-            color: #ffffff !important; /* Texto Blanco (Ya no amarillo) */
+            background: transparent !important;
+            border: 2px solid #ffffff !important; 
+            border-radius: 50px !important; 
+            color: #ffffff !important; 
             font-weight: bold;
             cursor: pointer;
-            box-shadow: 0 0 10px rgba(255, 123, 0, 0.3);
+            box-shadow: 0 0 10px rgba(0, 198, 255, 0.3);
             max-width: 200px;
         }
 
@@ -114,11 +114,22 @@
         .btn-del { background: #ff4757; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
 
         /* Estilos Flatpickr Personalizados */
-        .flatpickr-calendar { background: #0d0d0d !important; border: 1px solid var(--naranja-fuego) !important; box-shadow: 0 0 15px var(--naranja-fuego) !important; }
-        .flatpickr-day.selected { background: var(--naranja-fuego) !important; border-color: var(--naranja-fuego) !important; color: #000 !important; font-weight: bold !important; }
+        .flatpickr-calendar { background: #0d0d0d !important; border: 1px solid var(--azul-wntv) !important; box-shadow: 0 0 15px rgba(0, 198, 255, 0.4) !important; }
         
-        /* Cambiado Amarillo por Azul en el desplegable */
-        .flatpickr-current-month, .flatpickr-weekday { color: var(--azul-wntv) !important; }
+        /* Efecto entorno para el día seleccionado (Sin fondo sólido) */
+        .flatpickr-day.selected { 
+            background: transparent !important; 
+            border: 2px solid var(--naranja-fuego) !important; 
+            color: var(--naranja-fuego) !important; 
+            box-shadow: 0 0 12px var(--naranja-fuego) !important; 
+            font-weight: bold !important;
+            border-radius: 50% !important;
+        }
+
+        /* Colores elegantes para el menú desplegable */
+        .flatpickr-current-month { color: #ffffff !important; text-shadow: 0 0 5px var(--azul-wntv); }
+        .flatpickr-weekday { color: var(--azul-wntv) !important; font-weight: bold !important; }
+        .flatpickr-prev-month, .flatpickr-next-month { fill: #ffffff !important; }
     </style>
 </head>
 <body>
