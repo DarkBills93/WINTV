@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getFirestore, collection, addDoc, updateDoc, doc, query, onSnapshot, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, query, onSnapshot, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBg15QlVDXJMjBT7_1B-e-S3NYfvjHJ7FI",
@@ -13,162 +13,125 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 let clientesNocturnos = [];
-let historialSoporte = []; // Nueva variable para cruzar datos
+const FECHA_HOY = new Date().toLocaleDateString('en-CA'); // Detecta automáticamente el día actual
 
 function iniciarSincronizacion() {
-    // Escuchar colección Administrador
     onSnapshot(query(collection(db, "Administrador"), orderBy("Fecha", "desc")), (snapshot) => {
         clientesNocturnos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        if (!document.getElementById('admin-panel').classList.contains('hidden')) actualizarMonitorAdmin();
-        if (!document.getElementById('user-panel').classList.contains('hidden')) renderizarClientesTecnico();
-    });
-
-    // Escuchar colección Soporte (Aquí es donde está el nombre real del técnico)
-    onSnapshot(query(collection(db, "Soporte"), orderBy("Fecha", "desc")), (snapshot) => {
-        historialSoporte = snapshot.docs.map(doc => doc.data());
-        const contenedor = document.getElementById('log-historial-nocturno');
-        if (contenedor) {
-            contenedor.innerHTML = `<h4 style="color: #00c6ff;">Historial Reciente:</h4>` + historialSoporte.slice(0,10).map(h => `
-                <div style="border-bottom: 1px solid #1a2a3a; padding: 10px; font-size: 0.9em; text-align:left;">
-                    <b style="color:#00c6ff;">${h.Cliente}</b> <span style="color:#2ecc71;">(${h.Soporte})</span>: ${h.Solucion}
-                </div>`).join('');
-        }
+        actualizarInterfaz();
     });
 }
 
-window.checkLogin = function() {
+function actualizarInterfaz() {
+    // Monitor Administrador
+    const monitor = document.getElementById('monitor-lista');
+    if(monitor) {
+        monitor.innerHTML = clientesNocturnos.map(c => `
+            <tr>
+                <td>${c.Cliente}</td>
+                <td>${c.Estado === 'ATENDIDO' ? '✅' : '⏳'}</td>
+                <td><button class="btn-delete" onclick="eliminarFila('${c.id}')">Eliminar</button></td>
+            </tr>`).join('');
+    }
+
+    // Panel Soporte (Pendientes)
+    const listaSop = document.getElementById('lista-clientes-soporte');
+    if(listaSop && !document.getElementById('user-panel').classList.contains('hidden')) {
+        const pendientes = clientesNocturnos.filter(c => c.Estado === "pendiente");
+        listaSop.innerHTML = pendientes.map(c => `
+            <div class="soporte-card">
+                <b>USUARIO: ${c.Cliente}</b>
+                <textarea id="texto-${c.id}" placeholder="Escribe la solución dada..."></textarea>
+            </div>`).join('');
+    }
+
+    // Historial Solo Hoy
+    const logHoy = document.getElementById('log-hoy');
+    if(logHoy) {
+        const hoyAtendidos = clientesNocturnos.filter(c => {
+            if(!c.Fecha) return false;
+            const fDoc = new Date(c.Fecha.seconds * 1000).toLocaleDateString('en-CA');
+            return fDoc === FECHA_HOY && c.Estado === "ATENDIDO";
+        });
+        logHoy.innerHTML = hoyAtendidos.length ? hoyAtendidos.map(h => `
+            <div style="padding:10px; border-bottom:1px solid rgba(0,198,255,0.1); text-align:left;">
+                <b style="color:#00c6ff;">${h.Cliente}</b> <span style="color:#2ecc71;">(${h.Soporte || 'JC'})</span>: ${h.Solucion}
+            </div>`).join('') : '<p style="padding:10px; opacity:0.5;">No hay registros de hoy.</p>';
+    }
+}
+
+window.checkLogin = () => {
     if(document.getElementById('pass-admin').value === "SOPORTENOCTURNO") {
         document.getElementById('login-section').classList.add('hidden');
         document.getElementById('admin-panel').classList.remove('hidden');
         iniciarSincronizacion();
-    } else { alert("Clave Incorrecta"); }
+    } else { alert("Contraseña incorrecta"); }
 };
 
-window.showUserPanel = function() {
+window.showUserPanel = () => {
     document.getElementById('login-section').classList.add('hidden');
     document.getElementById('user-panel').classList.remove('hidden');
     iniciarSincronizacion();
 };
 
-window.agregarCliente = async function() {
+window.agregarCliente = async () => {
     const input = document.getElementById('nombre-cliente');
-    const nombre = input.value.trim().toUpperCase();
-    if(nombre) {
-        await addDoc(collection(db, "Administrador"), { 
-            Cliente: nombre, 
-            Estado: "pendiente", 
-            Fecha: serverTimestamp(), 
-            SNV2: "JC", // En Administrador siempre eres tú
-            Solucion: "" 
-        });
+    const nom = input.value.toUpperCase().trim();
+    if(nom) {
+        await addDoc(collection(db, "Administrador"), { Cliente: nom, Estado: "pendiente", Fecha: serverTimestamp(), SNV2: "JC" });
         input.value = "";
     }
 };
 
-window.guardarTodoElSoporte = async function() {
-    const nombreDelTecnico = document.getElementById('nombre-tecnico').value.trim().toUpperCase();
-    if(!nombreDelTecnico) return alert("Escribe tu nombre de técnico");
+window.eliminarFila = async (id) => {
+    if(confirm("¿Eliminar este registro permanentemente?")) { await deleteDoc(doc(db, "Administrador", id)); }
+};
 
-    const pendientes = clientesNocturnos.filter(c => c.Estado === "pendiente");
-    for (let c of pendientes) {
-        const texto = document.getElementById(`texto-${c.id}`).value.trim();
-        if(texto) {
-            // Se guarda en la colección Soporte con el nombre del que atiende
-            await addDoc(collection(db, "Soporte"), { 
-                Cliente: c.Cliente, 
-                Solucion: texto, 
-                Soporte: nombreDelTecnico, // Campo correcto según tu Firebase
-                Fecha: serverTimestamp() 
-            });
-            // Se actualiza Administrador manteniendo SNV2 como JC
-            await updateDoc(doc(db, "Administrador", c.id), { 
-                Estado: "ATENDIDO", 
-                SNV2: "JC", 
-                Solucion: texto 
-            });
+window.guardarTodoElSoporte = async () => {
+    const tecnico = document.getElementById('nombre-tecnico').value.trim().toUpperCase();
+    if(!tecnico) return alert("Por favor, ingresa tu nombre");
+    
+    for (let c of clientesNocturnos.filter(x => x.Estado === "pendiente")) {
+        const sol = document.getElementById(`texto-${c.id}`).value.trim();
+        if(sol) {
+            await addDoc(collection(db, "Soporte"), { Cliente: c.Cliente, Solucion: sol, Soporte: tecnico, Fecha: serverTimestamp() });
+            await updateDoc(doc(db, "Administrador", c.id), { Estado: "ATENDIDO", Solucion: sol, Soporte: tecnico, SNV2: "JC" });
         }
     }
-    alert("Sincronización completa");
+    alert("Sincronización exitosa.");
 };
 
-function renderizarClientesTecnico() {
-    const lista = clientesNocturnos.filter(c => c.Estado === "pendiente");
-    document.getElementById('lista-clientes-soporte').innerHTML = lista.map((c) => `
-        <div class="soporte-card">
-            <b>USUARIO: ${c.Cliente}</b>
-            <textarea id="texto-${c.id}" placeholder="Escribe la solución..."></textarea>
-        </div>`).join('');
-}
-
-function actualizarMonitorAdmin(listaFiltrada = null) {
-    const datos = listaFiltrada || clientesNocturnos;
-    document.getElementById('monitor-lista').innerHTML = `
-        <table style="width:100%; color:white; border-collapse: collapse; font-size: 0.85em;">
-            <tr style="background: #1a2a3a; color: #00c6ff;">
-                <th style="padding:12px; text-align:left;">CLIENTE</th>
-                <th style="padding:12px; text-align:center;">ESTADO</th>
-                <th style="padding:12px; text-align:center;">ADMIN SISTEMA</th>
-            </tr>
-            ${datos.map(c => `
-                <tr style="border-bottom: 1px solid #1a2a3a;">
-                    <td style="padding:10px;">${c.Cliente}</td>
-                    <td style="padding:10px; text-align:center;">${c.Estado === 'ATENDIDO' ? '✅' : '⏳'}</td>
-                    <td style="padding:10px; text-align:center; color:#f1c40f;">${c.SNV2}</td>
-                </tr>`).join('')}
-        </table>`;
-}
-
-window.exportarPDF = function(todo = false) {
+window.exportarPDF = (esHistorico) => {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF('p', 'mm', 'a4');
-    const fechaFiltro = document.getElementById('filtro-calendario')?.value;
+    const img = new Image();
+    img.src = 'img/logo.png';
+
+    // Encabezado Profesional
+    doc.addImage(img, 'PNG', 15, 10, 40, 40);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(22);
+    doc.text("INFORME DE ATENCIONES", 65, 25);
+    doc.text("NOCTURNAS - WNTV", 65, 35);
     
-    // Usamos el historial de Soporte para el PDF porque ahí están los nombres reales
-    let datosParaPDF = [...historialSoporte];
+    doc.setLineWidth(0.5); doc.line(15, 55, 195, 55);
+    doc.setFontSize(11);
+    doc.text("ADMINISTRADOR: JC", 15, 65);
+    doc.text(`TIPO: ${esHistorico ? 'REPORTE HISTÓRICO' : 'REPORTE DIARIO ('+FECHA_HOY+')'}`, 15, 72);
 
-    if (!todo && fechaFiltro) {
-        datosParaPDF = datosParaPDF.filter(h => {
-            if(!h.Fecha) return false;
-            const fDoc = new Date(h.Fecha.seconds * 1000).toLocaleDateString('en-CA');
-            return fDoc === fechaFiltro;
-        });
-    }
-
-    doc.setFontSize(20);
-    doc.setTextColor(0, 123, 255); 
-    doc.text("REPORTE DE ACTIVIDADES WNTV", 105, 20, { align: "center" });
-    
-    doc.setFontSize(10);
-    doc.setTextColor(100);
-    doc.text(`ADMINISTRADOR GENERAL: JC`, 14, 35);
-    doc.text(`FECHA REPORTE: ${fechaFiltro || new Date().toLocaleDateString()}`, 14, 40);
-    doc.line(14, 45, 196, 45);
-
-    // Mapeamos las filas usando el campo 'Soporte' (María, Frank, etc.)
-    const filas = datosParaPDF.map(h => [
-        h.Cliente, 
-        h.Soporte, // <--- Aquí va el nombre del técnico de la colección Soporte
-        h.Fecha ? new Date(h.Fecha.seconds * 1000).toLocaleDateString() : '---',
-        h.Solucion
-    ]);
+    const filtrados = esHistorico ? clientesNocturnos : clientesNocturnos.filter(c => {
+        if(!c.Fecha) return false;
+        const fFiltro = document.getElementById('filtro-calendario').value || FECHA_HOY;
+        return new Date(c.Fecha.seconds * 1000).toLocaleDateString('en-CA') === fFiltro;
+    });
 
     doc.autoTable({
-        startY: 50,
-        head: [['CLIENTE', 'TÉCNICO', 'FECHA', 'SOLUCIÓN']],
-        body: filas,
-        theme: 'striped',
-        headStyles: { fillColor: [0, 123, 255] }
+        startY: 80,
+        head: [['CLIENTE', 'TÉCNICO', 'SOLUCIÓN']],
+        body: filtrados.map(c => [c.Cliente, c.Soporte || 'JC', c.Solucion || 'Pendiente']),
+        headStyles: { fillColor: [0, 114, 255] },
+        theme: 'striped'
     });
 
-    doc.save(`Reporte_WNTV_${fechaFiltro || 'Historial'}.pdf`);
-};
-
-window.filtrarPorFecha = function(fecha) {
-    if (!fecha) return actualizarMonitorAdmin();
-    const filtrados = clientesNocturnos.filter(c => {
-        if(!c.Fecha) return false;
-        const fDoc = new Date(c.Fecha.seconds * 1000).toLocaleDateString('en-CA');
-        return fDoc === fecha;
-    });
-    actualizarMonitorAdmin(filtrados);
+    doc.save(esHistorico ? "Reporte_JC_Historico.pdf" : `Reporte_Diario_${FECHA_HOY}.pdf`);
 };
