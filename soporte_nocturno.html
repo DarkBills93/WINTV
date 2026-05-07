@@ -9,85 +9,145 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     
     <style>
-        /* MANTENEMOS TU FONDO PROFESIONAL */
-        body { 
-            background: #050b14 radial-gradient(circle at top, #0d1a2d 0%, #050b14 100%) no-repeat fixed; 
-            color: white; 
-            font-family: 'Segoe UI', sans-serif; 
-            margin: 0; 
-            min-height: 100vh; 
-        }
-        .hidden { display: none; }
-        .container { padding: 20px; text-align: center; }
-        
-        /* LOGO CON EL RESPLANDOR AMARILLO DE WNTV */
-        .logo-wrapper {
-            width: 160px; height: 160px; 
-            background: white; 
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 20px;
-            box-shadow: 0 0 50px rgba(255, 255, 120, 0.8); /* Brillo más fuerte */
-        }
-        .logo-wrapper img { width: 85%; border-radius: 50%; }
+        /* RESET Y FONDO GLOBAL CON IDENTIDAD WNTV */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        .neon-text { color: #ffffff; text-shadow: 0 0 15px #00c6ff; font-size: 2.5em; margin: 10px 0; font-weight: bold; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            color: #e6f1f5;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+            /* Fondo oficial: Azul profundo a negro mate */
+            background: linear-gradient(344deg, #000000, #022b50, #000000);
+            background-attachment: fixed;
+        }
+
+        /* Marca de Agua Sutil (Ruta de tu carpeta local) */
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            background-image: url('img/logo.png'); 
+            background-repeat: repeat;
+            background-position: center;
+            background-size: 140px;
+            opacity: 0.08; 
+            pointer-events: none;
+        }
+
+        .container { padding: 20px; text-align: center; position: relative; z-index: 1; }
+        .hidden { display: none; }
         
+        /* LOGO PRINCIPAL CON AURA BLANCA Y NEÓN */
+        .logo-principal {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px auto;
+            background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.72) 55%, transparent 40%);
+            border-radius: 50%;
+            padding: 18px 32px;
+            width: fit-content;
+            filter: drop-shadow(0 0 6px rgba(9, 133, 204, 0.986))
+                    drop-shadow(0 0 18px rgba(6, 104, 231, 0.5))
+                    drop-shadow(0 0 35px rgba(6, 88, 182, 0.712));
+            transition: transform 0.3s ease, filter 0.3s ease;
+        }
+
+        .logo-principal img { width: 140px; }
+
+        .logo-principal:hover {
+            transform: scale(1.03);
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.705))
+                    drop-shadow(0 0 24px rgba(243, 207, 4, 0.89))
+                    drop-shadow(0 0 50px rgba(255, 217, 0, 0.692));
+        }
+
+        /* TÍTULOS Y TEXTOS NEÓN */
+        .neon-text { 
+            color: #ffffff; 
+            text-shadow: 0 0 8px #00c6ff, 0 0 15px #00c6ff; 
+            font-size: 2.3rem; 
+            margin-bottom: 25px; 
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        /* BOTONES Y ENTRADAS */
+        .input-login { 
+            width: 100%; max-width: 350px; padding: 12px; border-radius: 8px; 
+            border: 1px solid rgba(0, 198, 255, 0.3); background: rgba(0, 0, 0, 0.5); 
+            color: #fff; margin-bottom: 15px; outline: none;
+        }
+        .input-login:focus { border-color: #00c6ff; }
+
         .btn-main { 
             width: 100%; max-width: 350px; padding: 14px; border-radius: 12px; border: none; 
-            background: linear-gradient(135deg, #00c6ff 0%, #007bff 100%); color: white; 
+            background: linear-gradient(135deg, #0072ff 0%, #00c6ff 100%); color: white; 
             font-weight: bold; cursor: pointer; transition: all 0.3s ease;
             box-shadow: 0 0 15px rgba(0, 198, 255, 0.4);
             margin-bottom: 10px;
         }
-        .btn-main:hover { box-shadow: 0 0 30px rgba(0, 198, 255, 0.8); transform: translateY(-2px); }
+        .btn-main:hover { transform: scale(1.02); box-shadow: 0 0 20px rgba(0, 198, 255, 0.6); }
 
-        .btn-secondary { background: #1a2a3a; box-shadow: 0 0 10px rgba(26, 42, 58, 0.4); }
+        .btn-secondary { background: linear-gradient(135deg, #434343 0%, #000000 100%); border: 1px solid #7000ff; }
 
-        .input-login { 
-            width: 100%; max-width: 350px; padding: 12px; border-radius: 8px; 
-            border: 1px solid #1a2a3a; background: #080f18; color: #fff; margin-bottom: 15px; 
-        }
-        
+        /* TARJETAS DE SOPORTE */
         .soporte-card { 
-            background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 12px; 
-            margin-bottom: 15px; border-left: 4px solid #00c6ff; text-align: left; 
+            background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 15px; 
+            margin-bottom: 15px; border-left: 5px solid #00c6ff; text-align: left;
+            backdrop-filter: blur(10px);
         }
-        textarea { width: 100%; height: 75px; background: #050b14; color: #fff; border: 1px solid #1a2a3a; border-radius: 8px; padding: 10px; box-sizing: border-box; }
+        textarea { 
+            width: 100%; height: 80px; background: rgba(0,0,0,0.3); color: #fff; 
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px; margin-top: 10px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="logo-wrapper"><img src="img/logo.png" alt="Logo WNTV"></div>
+        <div class="logo-principal">
+            <img src="img/logo.png" alt="Logo WNTV">
+        </div>
+
         <h1 class="neon-text">SOPORTE NOCTURNO</h1>
 
         <div id="login-section">
-            <input type="password" id="pass-admin" class="input-login" placeholder="Contraseña">
+            <input type="password" id="pass-admin" class="input-login" placeholder="Contraseña Administrador">
             <button onclick="checkLogin()" class="btn-main">ENTRAR COMO ADMIN</button>
             <button onclick="showUserPanel()" class="btn-main btn-secondary">ACCESO SOPORTE NOCTURNO</button>
         </div>
 
         <div id="admin-panel" class="hidden" style="max-width: 850px; margin: auto;">
-            <h2 style="color: #00c6ff;">⚙️ Control Maestro - JC</h2>
-            <input type="text" id="nombre-cliente" class="input-login" placeholder="Nombre del Usuario">
-            <button onclick="agregarCliente()" class="btn-main" style="width: auto;">+ Agregar</button>
-            
-            <div style="margin: 25px 0;">
-                <input type="date" id="filtro-calendario" class="input-login" style="width: auto;" onchange="filtrarPorFecha(this.value)">
-                <button onclick="exportarPDF(false)" style="background:#e67e22; color:white; padding:12px; border:none; border-radius:8px; cursor:pointer;">📄 PDF Diario</button>
-                <button onclick="exportarPDF(true)" style="background:#27ae60; color:white; padding:12px; border:none; border-radius:8px; cursor:pointer;">📥 Todo</button>
+            <h2 style="color: #00c6ff; margin-bottom: 20px;">⚙️ Control Maestro - JC</h2>
+            <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px;">
+                <input type="text" id="nombre-cliente" class="input-login" placeholder="Nombre del Usuario">
+                <button onclick="agregarCliente()" class="btn-main" style="width: auto; padding: 12px 30px;">+ Agregar</button>
             </div>
+            
+            <div style="margin: 25px 0; display: flex; gap: 10px; justify-content: center; align-items: center; flex-wrap: wrap;">
+                <input type="date" id="filtro-calendario" class="input-login" style="width: auto; margin-bottom: 0;" onchange="filtrarPorFecha(this.value)">
+                <button onclick="exportarPDF(false)" style="background:#e67e22; color:white; padding:12px 20px; border:none; border-radius:8px; cursor:pointer; font-weight: bold;">📄 PDF Diario</button>
+                <button onclick="exportarPDF(true)" style="background:#27ae60; color:white; padding:12px 20px; border:none; border-radius:8px; cursor:pointer; font-weight: bold;">📥 Reporte Histórico JC</button>
+            </div>
+
             <div id="monitor-lista"></div>
-            <button onclick="window.location.reload()" class="btn-main btn-secondary" style="margin-top:20px;">Cerrar Sesión</button>
+            <button onclick="window.location.reload()" class="btn-main btn-secondary" style="margin-top:20px; max-width: 200px;">Cerrar Sesión</button>
         </div>
 
-        <div id="user-panel" class="hidden" style="max-width: 600px; margin: auto;">
-            <input type="text" id="nombre-tecnico" class="input-login" placeholder="Escribe tu nombre (María, Frank...)">
+        <div id="user-panel" class="hidden" style="max-width: 650px; margin: auto;">
+            <div style="margin-bottom: 20px;">
+                <label style="color: #00c6ff; display: block; margin-bottom: 10px; font-weight: bold;">TÉCNICO DE TURNO:</label>
+                <input type="text" id="nombre-tecnico" class="input-login" placeholder="Ej: María, Frank, Luis...">
+            </div>
             <div id="lista-clientes-soporte"></div>
-            <button onclick="guardarTodoElSoporte()" class="btn-main">💾 Guardar y Enviar</button>
-            <div id="log-historial-nocturno"></div>
+            <button onclick="guardarTodoElSoporte()" class="btn-main" style="margin-top: 20px;">💾 Guardar Actividades y Enviar</button>
+            <div id="log-historial-nocturno" style="margin-top: 30px;"></div>
         </div>
     </div>
+
     <script type="module" src="soporte.js"></script>
 </body>
 </html>
