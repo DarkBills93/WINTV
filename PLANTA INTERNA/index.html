@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Fusión de Fibras</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        h2 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 8px;
+        }
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+            font-size: 14px;
+        }
+        th {
+            background-color: #2c3e50;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .btn-edit {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-edit:hover {
+            background-color: #2980b9;
+        }
+        /* Estilos para las celdas de color pintadas */
+        .color-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            text-shadow: 0px 0px 2px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Gestión de Fusiones por Zona</h2>
+    
+    <div class="form-group">
+        <label for="selectZona">Seleccione una Zona:</label>
+        <select id="selectZona" onchange="mostrarDatosZona()">
+            <option value="">-- Seleccione una zona --</option>
+            <option value="zonaA">Zona A - Norte</option>
+            <option value="zonaB">Zona B - Sur</option>
+        </select>
+    </div>
+
+    <div id="resultadoContainer" style="display: none;">
+        <h3 id="tituloZona"></h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nro. de Caja</th>
+                    <th>Hilo de Llegada</th>
+                    <th>Hilo con que se fusiona (Color)</th>
+                    <th>Estado de la Fibra</th>
+                    <th>Código</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody id="tablaCuerpo">
+                <!-- Los datos se inyectarán dinámicamente aquí -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // Definición de los 12 colores estándar de fibra óptica con sus códigos HEX y color de texto adecuado
+    const coloresFibra = [
+        { nombre: "Azul", hex: "#0000FF", text: "#FFFFFF" },
+        { nombre: "Naranja", hex: "#FF8000", text: "#000000" },
+        { nombre: "Verde", hex: "#008000", text: "#FFFFFF" },
+        { nombre: "Marrón", hex: "#804000", text: "#FFFFFF" },
+        { nombre: "Gris", hex: "#808080", text: "#FFFFFF" },
+        { nombre: "Blanco", hex: "#FFFFFF", text: "#000000" },
+        { nombre: "Rojo", hex: "#FF0000", text: "#FFFFFF" },
+        { nombre: "Negro", hex: "#000000", text: "#FFFFFF" },
+        { nombre: "Amarillo", hex: "#FFFF00", text: "#000000" },
+        { nombre: "Violeta", hex: "#800080", text: "#FFFFFF" },
+        { nombre: "Rosado", hex: "#FFC0CB", text: "#000000" },
+        { nombre: "Celeste", hex: "#00FFFF", text: "#000000" }
+    ];
+
+    // Datos simulados por zona (puedes conectarlo a Firebase o tu base de datos)
+    const baseDatosZonas = {
+        zonaA: [
+            { caja: "Caja 01", hiloLlegada: "Hilo 1", colorFusionIndex: 0, estado: "Activo", codigo: "COD-001" },
+            { caja: "Caja 01", hiloLlegada: "Hilo 2", colorFusionIndex: 2, estado: "Activo", codigo: "COD-002" },
+            { caja: "Caja 02", hiloLlegada: "Hilo 1", colorFusionIndex: 4, estado: "Libre", codigo: "COD-003" }
+        ],
+        zonaB: [
+            { caja: "Caja 05", hiloLlegada: "Hilo 1", colorFusionIndex: 1, estado: "Activo", codigo: "COD-004" },
+            { caja: "Caja 06", hiloLlegada: "Hilo 3", colorFusionIndex: 6, estado: "Mantenimiento", codigo: "COD-005" }
+        ]
+    };
+
+    function mostrarDatosZona() {
+        const zonaSelect = document.getElementById("selectZona").value;
+        const container = document.getElementById("resultadoContainer");
+        const tbody = document.getElementById("tablaCuerpo");
+        const tituloZona = document.getElementById("tituloZona");
+        
+        tbody.innerHTML = "";
+
+        if (!zonaSelect) {
+            container.style.display = "none";
+            return;
+        }
+
+        container.style.display = "block";
+        tituloZona.innerText = "Registros de la " + document.getElementById("selectZona").selectedOptions[0].text;
+
+        const datos = baseDatosZonas[zonaSelect] || [];
+
+        if (datos.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align: center;">No hay registros para esta zona.</td></tr>`;
+            return;
+        }
+
+        datos.forEach((item, index) => {
+            const colorInfo = coloresFibra[item.colorFusionIndex];
+            
+            // Creamos la etiqueta pintada con el color correspondiente (sin texto plano aburrido)
+            const spanColor = `<span class="color-badge" style="background-color: ${colorInfo.hex}; color: ${colorInfo.text};">${colorInfo.nombre}</span>`;
+
+            const fila = `
+                <tr>
+                    <td>${item.caja}</td>
+                    <td>${item.hiloLlegada}</td>
+                    <td>${spanColor}</td>
+                    <td>${item.estado}</td>
+                    <td>${item.codigo}</td>
+                    <td><button class="btn-edit" onclick="editarRegistro('${zonaSelect}', ${index})">Editar</button></td>
+                </tr>
+            `;
+            tbody.innerHTML += fila;
+        });
+    }
+
+    function editarRegistro(zona, index) {
+        alert(`Modificar registro ${index + 1} de la ${zona}. Aquí puedes abrir un modal o formulario de edición.`);
+    }
+</script>
+
+</body>
+</html>
