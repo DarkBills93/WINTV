@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Fusión de Fibras</title>
+    <title>Gestión de Fusiones - Planta Interna</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -32,12 +32,13 @@
             display: block;
             margin-bottom: 8px;
         }
-        select {
+        input[type="text"] {
             width: 100%;
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 4px;
             font-size: 16px;
+            box-sizing: border-box;
         }
         table {
             width: 100%;
@@ -69,7 +70,6 @@
         .btn-edit:hover {
             background-color: #2980b9;
         }
-        /* Estilos para las celdas de color pintadas */
         .color-badge {
             display: inline-block;
             padding: 4px 8px;
@@ -85,12 +85,56 @@
     <h2>Gestión de Fusiones por Zona</h2>
     
     <div class="form-group">
-        <label for="selectZona">Seleccione una Zona:</label>
-        <select id="selectZona" onchange="mostrarDatosZona()">
-            <option value="">-- Seleccione una zona --</option>
-            <option value="zonaA">Zona A - Norte</option>
-            <option value="zonaB">Zona B - Sur</option>
-        </select>
+        <label for="inputZona">Escriba o seleccione una Zona:</label>
+        <input type="text" id="inputZona" list="listaZonas" placeholder="Ej. FLOR MARTEL 2..." oninput="mostrarDatosZona()">
+        <datalist id="listaZonas">
+            <option value="FLOR MARTEL 2">
+            <option value="MOLINA 1">
+            <option value="TREBOL">
+            <option value="CORINTHIOS 3">
+            <option value="BURGOS">
+            <option value="VILLA ESPERANZA 2">
+            <option value="JAZMINES 1">
+            <option value="SINCHI ROCA">
+            <option value="LOS ANGELES">
+            <option value="VILLA ESPERANZA 1">
+            <option value="CLAVELES">
+            <option value="MOLINA 2">
+            <option value="R28">
+            <option value="PEDREGALITO 3">
+            <option value="VALLE 2">
+            <option value="CORINTHIOS 2">
+            <option value="VALLE 1">
+            <option value="PEDREGAL BAJO">
+            <option value="PALOMAR 2">
+            <option value="FLOR MARTEL 1">
+            <option value="PALOMAR 1">
+            <option value="CORINTHIOS">
+            <option value="BELLA VISTA">
+            <option value="PARADITA">
+            <option value="PEDREGALITO 2">
+            <option value="LOMAS ALTAS 2">
+            <option value="LOMAS BAJAS 2">
+            <option value="LOMAS BAJAS">
+            <option value="PEDREGALITO 1">
+            <option value="LOMAS ALTAS">
+            <option value="VALLE SAGRADO 3">
+            <option value="COLINA 2">
+            <option value="VALLE SAGRADO 1">
+            <option value="ALAMO 2 (A2)">
+            <option value="ALAMO 3 (A3)">
+            <option value="JAZMINES 2">
+            <option value="ALAMO 5 (A5)">
+            <option value="ALAMO 1">
+            <option value="COLINA 1">
+            <option value="VALLE SAGRADO 2">
+            <option value="ALAMO 4 (A4)">
+            <option value="VALLE SAGRADO 6">
+            <option value="COLINA 3">
+            <option value="VALLE SAGRADO 4">
+            <option value="VALLE SAGRADO 5">
+            <option value="AVICOP">
+        </datalist>
     </div>
 
     <div id="resultadoContainer" style="display: none;">
@@ -107,14 +151,14 @@
                 </tr>
             </thead>
             <tbody id="tablaCuerpo">
-                <!-- Los datos se inyectarán dinámicamente aquí -->
+                <!-- Se llena dinámicamente -->
             </tbody>
         </table>
     </div>
 </div>
 
 <script>
-    // Definición de los 12 colores estándar de fibra óptica con sus códigos HEX y color de texto adecuado
+    // Los 12 colores estándar de fibra óptica
     const coloresFibra = [
         { nombre: "Azul", hex: "#0000FF", text: "#FFFFFF" },
         { nombre: "Naranja", hex: "#FF8000", text: "#000000" },
@@ -130,64 +174,62 @@
         { nombre: "Celeste", hex: "#00FFFF", text: "#000000" }
     ];
 
-    // Datos simulados por zona (puedes conectarlo a Firebase o tu base de datos)
-    const baseDatosZonas = {
-        zonaA: [
-            { caja: "Caja 01", hiloLlegada: "Hilo 1", colorFusionIndex: 0, estado: "Activo", codigo: "COD-001" },
-            { caja: "Caja 01", hiloLlegada: "Hilo 2", colorFusionIndex: 2, estado: "Activo", codigo: "COD-002" },
-            { caja: "Caja 02", hiloLlegada: "Hilo 1", colorFusionIndex: 4, estado: "Libre", codigo: "COD-003" }
-        ],
-        zonaB: [
-            { caja: "Caja 05", hiloLlegada: "Hilo 1", colorFusionIndex: 1, estado: "Activo", codigo: "COD-004" },
-            { caja: "Caja 06", hiloLlegada: "Hilo 3", colorFusionIndex: 6, estado: "Mantenimiento", codigo: "COD-005" }
-        ]
-    };
+    // Obtener lista completa de zonas desde el datalist
+    function obtenerZonasValidas() {
+        const options = document.querySelectorAll('#listaZonas option');
+        const zonas = [];
+        options.forEach(opt => zonas.push(opt.value));
+        return zonas;
+    }
 
     function mostrarDatosZona() {
-        const zonaSelect = document.getElementById("selectZona").value;
+        const zonaInput = document.getElementById("inputZona").value.trim().toUpperCase();
         const container = document.getElementById("resultadoContainer");
         const tbody = document.getElementById("tablaCuerpo");
         const tituloZona = document.getElementById("tituloZona");
         
         tbody.innerHTML = "";
 
-        if (!zonaSelect) {
+        const zonasValidas = obtenerZonasValidas();
+
+        if (!zonasValidas.includes(zonaInput)) {
             container.style.display = "none";
             return;
         }
 
         container.style.display = "block";
-        tituloZona.innerText = "Registros de la " + document.getElementById("selectZona").selectedOptions[0].text;
+        tituloZona.innerText = "Registros de la Zona: " + zonaInput;
 
-        const datos = baseDatosZonas[zonaSelect] || [];
-
-        if (datos.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="6" style="text-align: center;">No hay registros para esta zona.</td></tr>`;
-            return;
-        }
-
-        datos.forEach((item, index) => {
-            const colorInfo = coloresFibra[item.colorFusionIndex];
+        // Generar 16 cajas ordenadas del 01 al 16 sin repetir
+        for (let i = 1; i <= 16; i++) {
+            let numeroCajaStr = i < 10 ? "Caja 0" + i : "Caja " + i;
             
-            // Creamos la etiqueta pintada con el color correspondiente (sin texto plano aburrido)
-            const spanColor = `<span class="color-badge" style="background-color: ${colorInfo.hex}; color: ${colorInfo.text};">${colorInfo.nombre}</span>`;
+            // Asignación de colores de ejemplo (puedes cambiarlo luego con base de datos)
+            let colorLlegadaIndex = (i - 1) % 12;
+            let colorFusionIndex = (i + 2) % 12;
+
+            const colorLlegadaInfo = coloresFibra[colorLlegadaIndex];
+            const colorFusionInfo = coloresFibra[colorFusionIndex];
+
+            const spanLlegada = `<span class="color-badge" style="background-color: ${colorLlegadaInfo.hex}; color: ${colorLlegadaInfo.text};">Hilo ${i} (${colorLlegadaInfo.nombre})</span>`;
+            const spanFusion = `<span class="color-badge" style="background-color: ${colorFusionInfo.hex}; color: ${colorFusionInfo.text};">${colorFusionInfo.nombre}</span>`;
 
             const fila = `
                 <tr>
-                    <td>${item.caja}</td>
-                    <td>${item.hiloLlegada}</td>
-                    <td>${spanColor}</td>
-                    <td>${item.estado}</td>
-                    <td>${item.codigo}</td>
-                    <td><button class="btn-edit" onclick="editarRegistro('${zonaSelect}', ${index})">Editar</button></td>
+                    <td>${numeroCajaStr}</td>
+                    <td>${spanLlegada}</td>
+                    <td>${spanFusion}</td>
+                    <td>Activo</td>
+                    <td>COD-${i < 10 ? '00' + i : '0' + i}</td>
+                    <td><button class="btn-edit" onclick="editarRegistro('${zonaInput}', '${numeroCajaStr}')">Editar</button></td>
                 </tr>
             `;
             tbody.innerHTML += fila;
-        });
+        }
     }
 
-    function editarRegistro(zona, index) {
-        alert(`Modificar registro ${index + 1} de la ${zona}. Aquí puedes abrir un modal o formulario de edición.`);
+    function editarRegistro(zona, caja) {
+        alert(`Editar registro de la Zona: ${zona} - ${caja}`);
     }
 </script>
 
